@@ -1,0 +1,155 @@
+.bg-img {
+    background-image: url(https://img.freepik.com/free-vector/privacy-policy-concept-illustration_114360-7853.jpg?size=626&ext=jpg&ga=GA1.1.603601426.1671537950&semt=sph);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Login Form Checkbox (Remember Me) */
+.custom-checkbox .form-check-input {
+    border: 1px solid #007bff;
+    margin-top: 7.5px;
+}
+
+
+.form-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-heading {
+    font-size: 2.3rem;
+    color: #333;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.required-field {
+    font-size: 1.3rem;
+    color: #007bff;
+    animation: fadeIn 1s ease-in-out;
+}
+
+
+.input-container {
+    font-size: 1.2rem;
+    color: #333;
+    border-color: #007bff;
+    animation: slideIn 0.5s ease-in-out;
+}
+
+.input-container:hover {
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+
+.submit-button {
+    font-size: 1.5rem;
+    background-color: #007bff;
+    border-color: #007bff;
+    animation: growIn 0.5s ease-in-out;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+
+.password-toggle-icon {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+}
+
+
+.shake {
+    animation: shake 0.5s;
+    animation-iteration-count: 2;
+}
+
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes growIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+
+@keyframes shake {
+    0% {
+        transform: translate(1px, 1px) rotate(0deg);
+    }
+
+    10% {
+        transform: translate(-1px, -2px) rotate(-1deg);
+    }
+
+    20% {
+        transform: translate(-3px, 0px) rotate(1deg);
+    }
+
+    30% {
+        transform: translate(3px, 2px) rotate(0deg);
+    }
+
+    40% {
+        transform: translate(1px, -1px) rotate(1deg);
+    }
+
+    50% {
+        transform: translate(-1px, 2px) rotate(-1deg);
+    }
+
+    60% {
+        transform: translate(-3px, 1px) rotate(0deg);
+    }
+
+    70% {
+        transform: translate(3px, 1px) rotate(-1deg);
+    }
+
+    80% {
+        transform: translate(-1px, -1px) rotate(1deg);
+    }
+
+    90% {
+        transform: translate(1px, 2px) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(1px, -2px) rotate(-1deg);
+    }
+}

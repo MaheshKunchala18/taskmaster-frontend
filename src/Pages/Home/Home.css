@@ -1,0 +1,81 @@
+.App {
+    background: linear-gradient(135deg, #6a0dad, #8a2be2);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    overflow: hidden;
+}
+
+.text-white {
+    color: #fff;
+    text-shadow: 10px 10px 4px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+p {
+    font-size: 1.5rem;
+    margin-bottom: 40px;
+}
+
+
+.paragraph-gap {
+    margin-bottom: 100px;
+}
+
+
+
+.custom-button {
+    font-size: 1.2rem;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    background: #fff;
+    color: #6a0dad;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.custom-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.fade-in-down {
+    animation: fade-in-down 1s ease;
+}
+
+.fade-in-up {
+    animation: fade-in-up 1s ease;
+}
+
+
+@keyframes fade-in-down {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in-up {
+    0% {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

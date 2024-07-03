@@ -1,0 +1,66 @@
+.main-todos-page {
+    background-color: #6a0dad;
+    padding: 50px 0;
+    min-height: 100vh;
+}
+
+.add-task-button {
+    font-size: 2rem;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-top: 20px;
+}
+
+.add-task-button:hover {
+    background-color: #fff;
+    color: #6a0dad;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 10px;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 1.2rem;
+}
+
+.text-danger {
+    color: red;
+}
+
+.text-success {
+    color: green;
+}
+
+
+.profile-icon {
+    cursor: pointer;
+    font-size: 3rem;
+}
+
+.profile-popover {
+    height: 250px;
+    width: 300px;
+    z-index: 1;
+}
+
+.profile-popover .popover-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-popover .btn-danger {
+    margin-top: 10px;
+}
+
+.popover-body-text {
+    font-size: 18px;
+}
