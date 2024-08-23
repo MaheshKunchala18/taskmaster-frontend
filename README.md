@@ -1,70 +1,116 @@
-# Getting Started with Create React App
+# 📝 **Task Master**
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive task management system that helps users manage their tasks effectively with features like categorization, secure authentication, and responsive design.
 
-## Available Scripts
+## **Table of Contents**
 
-In the project directory, you can run:
+1. [📄 Project Overview](#📄-project-overview)
+2. [✨ Features](#✨-features)
+3. [🛠 Tech Stack](#🛠-tech-stack)
+4. [⚙️ Installation and Setup](#installation-and-setup)
+5. [🚀 Usage](#🚀-usage)
+6. [🔗 API Endpoints](#🔗-api-endpoints)
+7. [📂 Folder Structure](#📂-folder-structure)
+8. [🤝 Contributing](#🤝-contributing)
+9. [📬 Contact](#📬-contact)
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 📄 **Project Overview**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Task Master is a task management application designed to help users create, edit, delete, and categorize tasks. It offers secure user authentication and a responsive interface to enhance productivity.
 
-### `npm test`
+## ✨ **Features**
+- **Task Management:** Create, edit, delete, and categorize tasks (due, overdue, completed).
+- **User Authentication:** Secure login and registration system. Users only see their task data.
+- **Responsive Design:** Optimized for all devices, ensuring a seamless experience.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🛠 **Tech Stack**
 
-### `npm run build`
+### Frontend:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **React.js**: A powerful JavaScript library for building user interfaces.
+- **React Router DOM**: Manages the navigation and routing in the application.
+- **React Bootstrap**: Provides pre-styled components, enhancing UI design.
+- **React Icons**: Used for implementing scalable vector icons that can be customized easily.
+- **Axios**: Handles HTTP requests to communicate with the backend API.
+- **Font Awesome**: Provides a wide array of icons for enhancing UI.
+- **Testing Library (React, Jest-DOM, User Event)**: Used for unit testing the components to ensure code quality.
+- **Web Vitals**: Helps in measuring the core web vitals to monitor the performance of the web application.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Backend:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **Node.js**: The runtime environment for running JavaScript on the server-side.
+- **Express.js**: A minimal and flexible Node.js web application framework that provides robust features for building APIs.
+- **MongoDB**: A NoSQL database used for storing blog posts, user data, and other related information.
+- **Mongoose**: A MongoDB object modeling tool designed to work in an asynchronous environment.
+- **Body-Parser**: A middleware to handle parsing of incoming request bodies in a middleware before your handlers, available under req.body.
+- **Cors**: Middleware that can be used to enable CORS (Cross-Origin Resource Sharing) with various options.
+- **Dotenv**: Module to load environment variables from a .env file into process.env.
+- **Nodemon**: A utility that monitors for any changes in your source and automatically restarts your server.
+- **Mysql2**: A MySQL client for Node.js with a focus on performance, enabling interaction with a MySQL database.
 
-### `npm run eject`
+**Note**: The backend uses the ESM module type, enabling the use of "import" statements instead of "require". This aligns the backend with the modern JavaScript syntax, similar to what is used in the React.js frontend.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Testing
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **Jest & React Testing Library**: Used for unit and integration testing to ensure the application functions as expected.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+## ⚙️ **Installation and Setup**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### **Prerequisites**
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- Node.js (v14.x or higher)
+- MongoDB (local instance or MongoDB Atlas)
+- NPM or Yarn
 
-### Code Splitting
+### **Installation**
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. **Backend Setup:**
+   - Clone the repository:
+     ```bash
+     git clone https://github.com/MaheshKunchala18/taskmaster-backend
+     ```
+   - Navigate to the backend directory:
+     ```bash
+     cd taskmaster-backend
+     ```
+   - Install the dependencies:
+     ```bash
+     npm install
+     ```
+   - Create a `.env` file in the backend directory and add your environment variables:
+     ```bash
+     MONGODB_URI=your_mongodb_uri
+     PORT=3001
+     ```
+   - Start the backend server:
+     ```bash
+     npm start
+     ```
 
-### Analyzing the Bundle Size
+2. **Frontend Setup:**
+   - Clone the repository:
+     ```bash
+     git clone https://github.com/MaheshKunchala18/taskmaster-frontend
+     ```
+   - Navigate to the frontend directory:
+     ```bash
+     cd taskmaster-frontend
+     ```
+   - Install the dependencies:
+     ```bash
+     npm install
+     ```
+   - Create a `.env` file in the frontend directory and add your environment variables:
+     ```bash
+     REACT_APP_BACKEND_URL=your_backend_url
+     ```
+   - Start the frontend server:
+     ```bash
+     npm start
+     ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+3. **Access the Application:**
+   - Open your browser and navigate to `http://localhost:3000`.
