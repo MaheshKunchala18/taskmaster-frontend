@@ -2,6 +2,12 @@
 
 A comprehensive task management system that helps users manage their tasks effectively with features like categorization, secure authentication, and responsive design.
 
+## Links
+<a href="https://taskmasterwebapp.netlify.app/" target="_blank"> Live Demo </a> ↗️ |
+<a href="https://github.com/MaheshKunchala18/taskmaster-frontend" target="_blank"> Frontend Repository </a> <img src="https://img.icons8.com/material-outlined/24/000000/github.png" /> |
+<a href="https://github.com/MaheshKunchala18/taskmaster-backend" target="_blank"> Backend Repository </a> <img src="https://img.icons8.com/material-outlined/24/000000/github.png" />
+
+
 ## **Table of Contents**
 
 1. [📄 Project Overview](#project-overview)
