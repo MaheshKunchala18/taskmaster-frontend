@@ -3,14 +3,14 @@
 A comprehensive task management system that helps users manage their tasks effectively with features like categorization, secure authentication, and responsive design.
 
 ## Links
-<a href="https://taskmasterwebapp.netlify.app/" target="_blank"> Live Demo </a> ↗️ |
+<a href="https://taskmasterwebapp.netlify.app/" target="_blank"> Live Demo </a> 🌐 |
 <a href="https://github.com/MaheshKunchala18/taskmaster-frontend" target="_blank"> Frontend Repository </a> <img src="https://img.icons8.com/material-outlined/24/000000/github.png" /> |
 <a href="https://github.com/MaheshKunchala18/taskmaster-backend" target="_blank"> Backend Repository </a> <img src="https://img.icons8.com/material-outlined/24/000000/github.png" />
 
 
-## **Table of Contents**
+## **Table of Contents 📋**
 
-1. [📄 Project Overview](#project-overview)
+1. [🎯 Project Overview](#project-overview)
 2. [✨ Features](#features)
 3. [🛠 Tech Stack](#tech-stack)
 4. [⚙️ Installation and Setup](#️installation)
@@ -21,7 +21,7 @@ A comprehensive task management system that helps users manage their tasks effec
 9. [📬 Contact](#contact)
 
 
-<h2 id="project-overview"> <strong>📄 Project Overview</strong> </h2>
+<h2 id="project-overview"> <strong>🎯 Project Overview</strong> </h2>
 
 Task Master is a task management application designed to help users create, edit, delete, and categorize tasks. It offers secure user authentication and a responsive interface to enhance productivity.
 
@@ -91,11 +91,25 @@ Task Master is a task management application designed to help users create, edit
      ```bash
      npm install
      ```
-   - Create a `.env` file in the backend directory and add your environment variables:
-     ```bash
-     MONGODB_URI=your_mongodb_uri
-     PORT=3001
-     ```
+   - Create a `.env` file in the backend directory and add your environment variables. Depending on your setup, you can use MongoDB Atlas, a local MongoDB instance, or a local MySQL instance:
+      - **For MongoDB Atlas:**
+        ```bash
+        MONGODB_URI=your_mongodb_uri
+        PORT=3001
+        ```
+      - **For Local MongoDB (Compass):**
+        ```bash
+        MONGODB_URI=mongodb://localhost:27017/your_database_name
+        PORT=3001
+        ```
+      - **For Local MySQL:**
+        ```bash
+        MYSQL_HOST=localhost
+        MYSQL_USER=your_mysql_user
+        MYSQL_PASSWORD=your_mysql_password
+        MYSQL_DATABASE=your_mysql_database
+        PORT=3001
+        ```
    - Start the backend server:
      ```bash
      npm start
@@ -114,10 +128,15 @@ Task Master is a task management application designed to help users create, edit
      ```bash
      npm install
      ```
-   - Create a `.env` file in the frontend directory and add your environment variables:
-     ```bash
-     REACT_APP_BACKEND_URL=your_backend_url
-     ```
+   - Create a `.env` file in the frontend directory and add your environment variables. Depending on whether your backend is deployed or running locally, you can specify the backend URL accordingly:
+      - **If the backend is deployed:**
+        ```bash
+        REACT_APP_BACKEND_URL=your_backend_url
+        ```
+      - **If the backend is running locally:**
+        ```bash
+        REACT_APP_BACKEND_URL=http://localhost:3001
+        ```
    - Start the frontend server:
      ```bash
      npm start
@@ -128,9 +147,8 @@ Task Master is a task management application designed to help users create, edit
 
 <h2 id="usage"> <strong>🚀 Usage</strong> </h2>
 
-- **Home Page:** View popular and trending tasks.
-- **Task Management:** Create, edit, delete, and categorize your tasks.
 - **Authentication:** Sign up and log in to manage your tasks.
+- **Task Management:** Create, edit, delete, and categorize your tasks as due, overdue and completed.
 
 
 <h2 id="api-endpoints"> <strong>🔗 API Endpoints</strong> </h2>
@@ -139,8 +157,8 @@ Task Master is a task management application designed to help users create, edit
 - **POST /tasks:** Create a new task.
 - **PUT /tasks/:id:** Update an existing task.
 - **DELETE /tasks/:id:** Delete a task.
-- **POST /auth/signup:** Sign up a new user.
-- **POST /auth/login:** Log in a user.
+- **POST /signup:** Sign up a new user.
+- **POST /login:** Log in a user.
 
 
 <h2 id="folder-structure"> <strong>📂 Folder Structure</strong> </h2>
