@@ -6,7 +6,6 @@ import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import './Tasks.css';
 
-
 function Tasks() {
     const navigate = useNavigate();
 
@@ -16,21 +15,15 @@ function Tasks() {
     const [taskText, setTaskText] = useState('');
     const [dueTime, setDueTime] = useState('');
     const [selectedTask, setSelectedTask] = useState(null);
-
-    const [typeofTask, setTypeofTask] = useState('');  // For editing the task to know which task(due/overdue) to edit.
     const [completedTasks, setCompletedTasks] = useState([]);
-
     const [userName, setUserName] = useState('');
 
-    const [userData, setUserData] = useState(
-        {
-            username: '',
-            overdue: 0,
-            due: 0,
-            completed: 0
-        }
-    );
-
+    const [userData, setUserData] = useState({
+        username: '',
+        overdue: 0,
+        due: 0,
+        completed: 0
+    });
 
     useEffect(() => {
         const userId = localStorage.getItem('userId');
@@ -42,7 +35,6 @@ function Tasks() {
         }
     }, [navigate]);
 
-
     const fetchUser = async (userId) => {
         try {
             const user = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/user?userId=${userId}`);
@@ -52,7 +44,6 @@ function Tasks() {
             console.error('Error fetching user', error);
         }
     };
-
 
     const fetchTasks = async (userId) => {
         try {
@@ -65,31 +56,28 @@ function Tasks() {
         }
     };
 
-    const getCurrentDateTime = () => {
-        let date = new Date();
-        let year = date.getFullYear();
-        let month = (date.getMonth() + 1).toString().padStart(2, '0'); // padStart is used to add leading zeros
-        let day = date.getDate().toString().padStart(2, '0');
-        let hours = date.getHours().toString().padStart(2, '0');
-        let minutes = date.getMinutes().toString().padStart(2, '0');
-        let seconds = date.getSeconds().toString().padStart(2, '0');
-
-        let dateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        return dateTime;
-    }
+    const formatDateTime = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleString("en-GB", {
+            day: '2-digit',
+            month: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        }).replace(',', '');
+    };
 
     const handleAddTask = async () => {
         if (taskText.trim() !== '') {
             const userId = localStorage.getItem('userId');
-            const currentTime = getCurrentDateTime();
 
             const newTask = {
                 user_id: userId,
                 task_detail: taskText,
-                creation_time: currentTime,
-                lastedited_time: currentTime,
-                due_time: dueTime ? dueTime.replace('T', ' ').concat(':00') : null
+                due_time: dueTime
             };
+            
             try {
                 await axios.post(`${process.env.REACT_APP_BACKEND_URL}/tasks`, newTask);
                 fetchTasks(userId); // Refresh the task list
@@ -102,28 +90,29 @@ function Tasks() {
         setShowModal(false);
     };
 
-
     const handleEditTask = (task) => {
         setSelectedTask(task);
         setTaskText(task.task_detail);
-        setDueTime(task.due_time.replace('T', ' ').concat(':00')); // Convert to local datetime format
+        // Convert ISO date to datetime-local format
+        if (task.due_time) {
+            const date = new Date(task.due_time);
+            const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+            setDueTime(localDateTime);
+        }
         setShowModal(true);
     };
 
-
     const handleSaveEditTask = async () => {
         if (selectedTask && taskText.trim() !== '') {
-            const currentTime = getCurrentDateTime();
             const editedTask = {
-                ...selectedTask,
                 task_detail: taskText,
-                lastedited_time: currentTime,
-                due_time: dueTime ? dueTime.replace('T', ' ').concat(':00') : null
+                due_time: dueTime
             };
+            
             try {
-                if (typeofTask === 'due') await axios.put(`${process.env.REACT_APP_BACKEND_URL}/duetasks/${selectedTask._id}`, editedTask);
-                else await axios.put(`${process.env.REACT_APP_BACKEND_URL}/overduetasks/${selectedTask._id}`, editedTask);
-
+                await axios.put(`${process.env.REACT_APP_BACKEND_URL}/tasks/${selectedTask._id}`, editedTask);
                 const userId = localStorage.getItem('userId');
                 fetchTasks(userId); // Refresh the task list
                 setSelectedTask(null);
@@ -136,12 +125,9 @@ function Tasks() {
         setShowModal(false);
     };
 
-
-    const handleDeleteTask = async (task, typeofTask) => {
+    const handleDeleteTask = async (task) => {
         try {
-            if (typeofTask === 'due') await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/duetasks/${task._id}`);
-            else await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/overduetasks/${task._id}`);
-
+            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/tasks/${task._id}`);
             const userId = localStorage.getItem('userId');
             fetchTasks(userId); // Refresh the task list
         } catch (error) {
@@ -149,19 +135,15 @@ function Tasks() {
         }
     };
 
-
-    const handleCompleteTask = async (task, typeofTask) => {
+    const handleCompleteTask = async (task) => {
         try {
-            if (typeofTask === 'due') await axios.put(`${process.env.REACT_APP_BACKEND_URL}/completeduetask/${task._id}`);
-            else if (typeofTask === 'overdue') await axios.put(`${process.env.REACT_APP_BACKEND_URL}/completeoverduetask/${task._id}`);
-
+            await axios.put(`${process.env.REACT_APP_BACKEND_URL}/tasks/${task._id}/complete`);
             const userId = localStorage.getItem('userId');
             fetchTasks(userId); // Refresh the task list
         } catch (error) {
-            console.error('Error Completing task:', error);
+            console.error('Error completing task:', error);
         }
     };
-
 
     const handleLogOut = () => {
         localStorage.removeItem('userId');
@@ -191,7 +173,6 @@ function Tasks() {
             completed: completedTasks.length
         });
     }
-
 
     return (
         <div className="main-todos-page">
@@ -228,14 +209,15 @@ function Tasks() {
                                         <Card.Text key={index} className="text-danger">
                                             Task: {task.task_detail}
                                             <br />
-                                            Created at: {new Date(task.creation_time).toLocaleString("en-IN").replace('pm', 'PM').replace('am', 'AM')}
+                                            Created at: {formatDateTime(task.creation_time)}
                                             <br />
-                                            Last Edited at: {new Date(task.lastedited_time).toLocaleString("en-IN").replace('pm', 'PM').replace('am', 'AM')}
+                                            Last Edited at: {formatDateTime(task.lastedited_time)}
                                             <br />
-                                            Due at: {new Date(task.due_time).toLocaleString("en-IN").replace('pm', 'PM').replace('am', 'AM')}
+                                            Due at: {formatDateTime(task.due_time)}
                                             <br />
-                                            <Button variant="primary" onClick={() => { handleEditTask(task); setTypeofTask('overdue') }} className="mt-2"> Edit </Button>
-                                            <Button variant="danger" onClick={() => handleDeleteTask(task, 'overdue')} className="mt-2 mx-2"> Delete </Button>
+                                            <Button variant="primary" onClick={() => handleEditTask(task)} className="mt-2"> Edit </Button>
+                                            <Button variant="danger" onClick={() => handleDeleteTask(task)} className="mt-2 mx-2"> Delete </Button>
+                                            <Button variant="success" onClick={() => handleCompleteTask(task)} className="mt-2"> Complete </Button>
                                         </Card.Text>
                                     ))
                                 )}
@@ -255,15 +237,15 @@ function Tasks() {
                                         <Card.Text key={index}>
                                             Task: {task.task_detail}
                                             <br />
-                                            Created at: {new Date(task.creation_time).toLocaleString("en-IN").replace('pm', 'PM').replace('am', 'AM')}
+                                            Created at: {formatDateTime(task.creation_time)}
                                             <br />
-                                            Last Edited at: {new Date(task.lastedited_time).toLocaleString("en-IN").replace('pm', 'PM').replace('am', 'AM')}
+                                            Last Edited at: {formatDateTime(task.lastedited_time)}
                                             <br />
-                                            Due at: {new Date(task.due_time).toLocaleString("en-IN").replace('pm', 'PM').replace('am', 'AM')}
+                                            Due at: {formatDateTime(task.due_time)}
                                             <br />
-                                            <Button variant="primary" onClick={() => { handleEditTask(task); setTypeofTask('due'); }} className="mt-2"> Edit </Button>
-                                            <Button variant="danger" onClick={() => handleDeleteTask(task, 'due')} className="mt-2 mx-2"> Delete </Button>
-                                            <Button variant="success" onClick={() => handleCompleteTask(task, 'due')} className="mt-2"> Complete </Button>
+                                            <Button variant="primary" onClick={() => handleEditTask(task)} className="mt-2"> Edit </Button>
+                                            <Button variant="danger" onClick={() => handleDeleteTask(task)} className="mt-2 mx-2"> Delete </Button>
+                                            <Button variant="success" onClick={() => handleCompleteTask(task)} className="mt-2"> Complete </Button>
                                         </Card.Text>
                                     ))
                                 )}
@@ -283,11 +265,11 @@ function Tasks() {
                                         <Card.Text key={index} className="text-success">
                                             Task: {task.task_detail}
                                             <br />
-                                            Created at: {new Date(task.creation_time).toLocaleString("en-IN").replace('pm', 'PM').replace('am', 'AM')}
+                                            Created at: {formatDateTime(task.creation_time)}
                                             <br />
-                                            Last Edited at: {new Date(task.lastedited_time).toLocaleString("en-IN").replace('pm', 'PM').replace('am', 'AM')}
+                                            Last Edited at: {formatDateTime(task.lastedited_time)}
                                             <br />
-                                            Due at: {new Date(task.due_time).toLocaleString("en-IN").replace('pm', 'PM').replace('am', 'AM')}
+                                            Due at: {formatDateTime(task.due_time)}
                                             <br />
                                         </Card.Text>
                                     ))

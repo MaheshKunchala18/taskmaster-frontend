@@ -6,23 +6,19 @@ import { AuthContext } from './AuthContext';
 import axios from "axios";
 import './LoginSignup.css';
 
-
-
 function Signup() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showImage, setShowImage] = useState(true);
+    const [invalidInput, setInvalidInput] = useState(false);
+    const [strength, setStrength] = useState(0);
+    const [showPassword, setShowPassword] = useState(false);
 
-    const [showImage, setShowImage] = useState(true);         // When the device-width is < 700px. It removes the image.
-    const [invalidInput, setInvalidInput] = useState(false);  // When Password and Confirm Password not matches, boxes animate.
-    const [strength, setStrength] = useState(0);              // Whenever user enters password, progress bar changes.
-    const [showPassword, setShowPassword] = useState(false);  // Flips EyeIcon to show/hide password.
-
-    const navigate = useNavigate();  // Redirects to another page upon successful signup
-    const { setUserId } = useContext(AuthContext);  // Assuming you have setUserId in context
-
+    const navigate = useNavigate();
+    const { setUserId } = useContext(AuthContext);
 
     const calculateStrength = (password) => {
         let strength = 0;
@@ -36,7 +32,6 @@ function Signup() {
         return strength;
     };
 
-
     const handlePasswordChange = (event) => {
         const password = event.target.value;
         setPassword(password);
@@ -47,16 +42,14 @@ function Signup() {
         setShowPassword(!showPassword);
     };
 
-
     let variant;
-    if (strength <= 1) variant = 'danger'; // very weak
-    else if (strength <= 2) variant = 'warning'; // weak
-    else if (strength <= 3) variant = 'info'; // good
-    else variant = 'success'; // strong
+    if (strength <= 1) variant = 'danger';
+    else if (strength <= 2) variant = 'warning';
+    else if (strength <= 3) variant = 'info';
+    else variant = 'success';
 
     const passwordStrengthMessage =
         strength === 0 ? 'Password Strength' : strength === 1 ? 'Very Weak' : strength === 2 ? 'Weak' : strength === 3 ? 'Good' : 'Strong';
-
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -76,8 +69,8 @@ function Signup() {
 
             if (response.status === 201) {
                 const userId = response.data.userId;
-                localStorage.setItem('userId', userId); // Store userId in local storage
-                setUserId(userId); // Update context
+                localStorage.setItem('userId', userId);
+                setUserId(userId);
                 navigate('/tasks');
             } else {
                 console.error('Signup failed');
@@ -99,9 +92,6 @@ function Signup() {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
-
-
-
 
     return (
         <Container fluid>
@@ -182,7 +172,6 @@ function Signup() {
                                     <p style={{marginBottom: '2px', fontSize: '15px', fontWeight: '400'}} >Password Strength</p>
                                     <ProgressBar className="mb-3" striped variant={variant} now={(strength / 4) * 100} label={passwordStrengthMessage} />
 
-
                                     <Form.Group className="mb-4" controlId="formConfirmPassword">
                                         <Form.Label>
                                             <span className="required-field">Confirm Password</span> <span style={{ color: 'red' }}>*</span>
@@ -214,6 +203,5 @@ function Signup() {
         </Container>
     );
 }
-
 
 export default Signup;
