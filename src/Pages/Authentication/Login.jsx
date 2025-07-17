@@ -5,15 +5,12 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { AuthContext } from './AuthContext';
 import './LoginSignup.css';
 
-
-
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showImage, setShowImage] = useState(true);
-    const [showPassword, setShowPassword] = useState(false);  // Flips EyeIcon to show/hide password.
-
-    const [invalidInput, setInvalidInput] = useState(false);  // When Email and Password not match, boxes animate.
+    const [showPassword, setShowPassword] = useState(false);
+    const [invalidInput, setInvalidInput] = useState(false);
     const { setUserId } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -30,7 +27,6 @@ function Login() {
         setShowPassword(!showPassword);
     };
 
-
     useEffect(() => {
         handleResize();
         window.addEventListener('resize', handleResize);
@@ -38,7 +34,6 @@ function Login() {
             window.removeEventListener('resize', handleResize);
         };
     }, []);
-
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -49,14 +44,14 @@ function Login() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email, password }) // Send email and password to server
+                body: JSON.stringify({ email, password })
             });
 
-            if (response.ok) { // Check if response status is 200
+            if (response.ok) {
                 const data = await response.json();
-                localStorage.setItem('userId', data.userId); // Save the user ID in local storage
-                setUserId(data.userId); // Update the context state
-                navigate('/tasks'); // Redirect to /tasks page
+                localStorage.setItem('userId', data.userId);
+                setUserId(data.userId);
+                navigate('/tasks');
             } else {
                 console.error('Login failed');
                 setInvalidInput(true);
@@ -66,7 +61,6 @@ function Login() {
             console.error('Error logging in:', error);
         }
     };
-
 
     return (
         <Container fluid>
@@ -82,7 +76,6 @@ function Login() {
                         </Row>
                         <Row className="justify-content-center">
                             <Col md={8}>
-
                                 <Form onSubmit={handleSubmit}>
                                     <Form.Group className="mb-3" controlId="formBasicEmail">
                                         <Form.Label>
@@ -97,7 +90,6 @@ function Login() {
                                             className={`input-container ${invalidInput ? 'shake' : ''}`}
                                         />
                                     </Form.Group>
-
 
                                     <Form.Group className="mb-4" controlId="formBasicPassword">
                                         <Form.Label>
@@ -117,7 +109,6 @@ function Login() {
                                             </div>
                                         </div>
                                     </Form.Group>
-
 
                                     <Form.Group className="mb-4" controlId="formBasicCheckbox">
                                         <Form.Check
@@ -145,6 +136,5 @@ function Login() {
         </Container>
     );
 }
-
 
 export default Login;
