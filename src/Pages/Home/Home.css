@@ -1,18 +1,28 @@
 .App {
-    background: linear-gradient(135deg, #6a0dad, #8a2be2);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
     height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 20px;
     text-align: center;
     font-family: 'Roboto', sans-serif;
     overflow: hidden;
+    position: relative;
+}
+
+/* Theme toggle positioning */
+.theme-toggle-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
 }
 
 .text-white {
-    color: #fff;
-    text-shadow: 10px 10px 4px rgba(0, 0, 0, 0.2);
+    color: var(--color-text-inverse);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
@@ -37,14 +47,17 @@ p {
     padding: 12px 24px;
     border: none;
     border-radius: 50px;
-    background: #fff;
-    color: #6a0dad;
-    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    background: var(--color-surface);
+    color: var(--color-primary);
+    transition: all var(--transition-normal);
+    font-weight: 600;
 }
 
 .custom-button:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
+    background: var(--color-surface-hover);
+    color: var(--color-primary-hover);
 }
 
 

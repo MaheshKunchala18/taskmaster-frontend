@@ -1,12 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import ThemeToggle from '../../components/ThemeToggle/ThemeToggle';
 import './Home.css';
 
 
 function Home() {
     return (
         <div className="App">
+            <div className="theme-toggle-container">
+                <ThemeToggle />
+            </div>
             <Container className="text-center">
                 <h1 className="text-white fade-in-down">
                     Welcome to TaskMaster - Your Ultimate Todo List App

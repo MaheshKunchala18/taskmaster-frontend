@@ -1,3 +1,11 @@
+/* Theme Toggle for Auth Pages */
+.theme-toggle-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
 .bg-img {
     background-image: url(https://img.freepik.com/free-vector/privacy-policy-concept-illustration_114360-7853.jpg?size=626&ext=jpg&ga=GA1.1.603601426.1671537950&semt=sph);
     background-repeat: no-repeat;
@@ -7,7 +15,7 @@
 
 /* Login Form Checkbox (Remember Me) */
 .custom-checkbox .form-check-input {
-    border: 1px solid #007bff;
+    border: 1px solid var(--color-primary);
     margin-top: 7.5px;
 }
 
@@ -16,44 +24,59 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--color-background);
 }
 
 .form-heading {
     font-size: 2.3rem;
-    color: #333;
+    color: var(--color-text-primary);
     animation: fadeIn 1s ease-in-out;
 }
 
 .required-field {
     font-size: 1.3rem;
-    color: #007bff;
+    color: var(--color-primary);
     animation: fadeIn 1s ease-in-out;
 }
 
 
 .input-container {
     font-size: 1.2rem;
-    color: #333;
-    border-color: #007bff;
+    color: var(--color-text-primary);
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
     animation: slideIn 0.5s ease-in-out;
+    transition: all var(--transition-fast);
 }
 
 .input-container:hover {
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    box-shadow: 0 0 10px rgba(106, 13, 173, 0.3);
+    border-color: var(--color-primary);
+}
+
+.input-container:focus {
+    background-color: var(--color-surface);
+    border-color: var(--color-primary);
+    color: var(--color-text-primary);
+    box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.25);
 }
 
 
 .submit-button {
     font-size: 1.5rem;
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-text-inverse);
     animation: growIn 0.5s ease-in-out;
+    transition: all var(--transition-fast);
 }
 
 .submit-button:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
+    color: var(--color-text-inverse);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 

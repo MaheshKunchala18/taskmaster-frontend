@@ -1,0 +1,195 @@
+/* Theme Toggle Component Styles */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: var(--border-radius-lg);
+  transition: all var(--transition-fast);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-surface-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text-primary);
+}
+
+.theme-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.3);
+}
+
+[data-theme="dark"] .theme-toggle:focus {
+  box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.3);
+}
+
+.theme-toggle:active {
+  transform: translateY(0);
+}
+
+/* Toggle Track */
+.theme-toggle-track {
+  position: relative;
+  width: 48px;
+  height: 24px;
+  background-color: var(--color-background-tertiary);
+  border-radius: 12px;
+  transition: background-color var(--transition-normal);
+  border: 1px solid var(--color-border);
+}
+
+.theme-toggle.dark .theme-toggle-track {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Toggle Thumb */
+.theme-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  background-color: var(--color-surface);
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle.dark .theme-toggle-thumb {
+  transform: translateX(24px);
+  background-color: var(--color-text-inverse);
+}
+
+/* Theme Icon */
+.theme-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-normal);
+}
+
+.theme-toggle.light .theme-icon {
+  color: #ffa500; /* Orange for sun */
+}
+
+.theme-toggle.dark .theme-icon {
+  color: #4169e1; /* Royal blue for moon */
+}
+
+/* Label */
+.theme-toggle-label {
+  font-weight: 500;
+  transition: color var(--transition-normal);
+  user-select: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .theme-toggle {
+    padding: 6px 10px;
+    gap: 8px;
+  }
+  
+  .theme-toggle-track {
+    width: 42px;
+    height: 22px;
+  }
+  
+  .theme-toggle-thumb {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .theme-toggle.dark .theme-toggle-thumb {
+    transform: translateX(20px);
+  }
+  
+  .theme-icon {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .theme-toggle-label {
+    font-size: 13px;
+  }
+}
+
+/* Compact version for smaller spaces */
+.theme-toggle.compact {
+  padding: 4px 8px;
+  gap: 6px;
+}
+
+.theme-toggle.compact .theme-toggle-track {
+  width: 36px;
+  height: 20px;
+}
+
+.theme-toggle.compact .theme-toggle-thumb {
+  width: 14px;
+  height: 14px;
+}
+
+.theme-toggle.compact.dark .theme-toggle-thumb {
+  transform: translateX(16px);
+}
+
+.theme-toggle.compact .theme-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.theme-toggle.compact .theme-toggle-label {
+  font-size: 12px;
+}
+
+/* Icon only version */
+.theme-toggle.icon-only {
+  padding: 8px;
+  gap: 0;
+  width: 48px;
+  height: 40px;
+  justify-content: center;
+}
+
+.theme-toggle.icon-only .theme-toggle-label {
+  display: none;
+}
+
+/* Animation for icon changes */
+.theme-icon svg {
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle:hover .theme-icon svg {
+  transform: scale(1.1);
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle,
+  .theme-toggle-track,
+  .theme-toggle-thumb,
+  .theme-icon,
+  .theme-icon svg {
+    transition: none;
+  }
+} 
