@@ -1,6 +1,6 @@
 .App {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
-    height: 100vh;
+    background: var(--color-background);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -8,8 +8,22 @@
     padding: 20px;
     text-align: center;
     font-family: 'Roboto', sans-serif;
-    overflow: hidden;
     position: relative;
+}
+
+/* Add subtle background pattern for visual interest */
+.App::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 25% 25%, var(--color-primary) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, var(--color-primary) 0%, transparent 50%);
+    opacity: 0.03;
+    pointer-events: none;
 }
 
 /* Theme toggle positioning */
@@ -20,19 +34,48 @@
     z-index: 10;
 }
 
+/* Home content card */
+.home-content-card {
+    background: var(--color-surface);
+    border-radius: var(--border-radius-xl);
+    padding: 60px 40px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-border);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .home-content-card {
+        padding: 40px 20px;
+        margin: 0 20px;
+    }
+}
+
 .text-white {
-    color: var(--color-text-inverse);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    color: var(--color-text-primary);
+    text-shadow: none;
 }
 
 h1 {
     font-size: 3rem;
     margin-bottom: 20px;
+    color: var(--color-text-primary);
+    font-weight: 700;
+}
+
+h2 {
+    color: var(--color-text-primary);
+    font-weight: 600;
 }
 
 p {
     font-size: 1.5rem;
     margin-bottom: 40px;
+    color: var(--color-text-secondary);
 }
 
 

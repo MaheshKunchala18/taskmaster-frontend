@@ -50,7 +50,7 @@
 }
 
 .input-container:hover {
-    box-shadow: 0 0 10px rgba(106, 13, 173, 0.3);
+    box-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
     border-color: var(--color-primary);
 }
 
@@ -58,7 +58,7 @@
     background-color: var(--color-surface);
     border-color: var(--color-primary);
     color: var(--color-text-primary);
-    box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(0, 122, 255, 0.25);
 }
 
 

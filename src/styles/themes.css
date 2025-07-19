@@ -1,32 +1,32 @@
 /* Theme CSS Variables and Base Styles */
 
 :root {
-  /* Default (Light) Theme Colors */
-  --color-primary: #6a0dad;
-  --color-primary-hover: #8a2be2;
-  --color-primary-light: #9a4eea;
+  /* Default (Light) Theme Colors - iOS/Windows inspired */
+  --color-primary: #007AFF;
+  --color-primary-hover: #0051D0;
+  --color-primary-light: #4DA2FF;
   
   --color-background: #ffffff;
-  --color-background-secondary: #f8f9fa;
-  --color-background-tertiary: #e9ecef;
+  --color-background-secondary: #f2f2f7;
+  --color-background-tertiary: #f2f2f7;
   
   --color-surface: #ffffff;
-  --color-surface-hover: #f8f9fa;
+  --color-surface-hover: #f9f9f9;
   --color-surface-elevated: #ffffff;
   
-  --color-text-primary: #212529;
-  --color-text-secondary: #6c757d;
-  --color-text-tertiary: #adb5bd;
+  --color-text-primary: #000000;
+  --color-text-secondary: #8e8e93;
+  --color-text-tertiary: #c7c7cc;
   --color-text-inverse: #ffffff;
   
-  --color-border: #dee2e6;
-  --color-border-light: #e9ecef;
-  --color-border-dark: #adb5bd;
+  --color-border: #d1d1d6;
+  --color-border-light: #e5e5ea;
+  --color-border-dark: #c7c7cc;
   
-  --color-success: #28a745;
-  --color-warning: #ffc107;
-  --color-error: #dc3545;
-  --color-info: #17a2b8;
+  --color-success: #34c759;
+  --color-warning: #ff9f0a;
+  --color-error: #ff3b30;
+  --color-info: #007AFF;
   
   /* Shadows */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -46,33 +46,33 @@
   --border-radius-xl: 1rem;
 }
 
-/* Dark Theme */
+/* Dark Theme - iOS/Windows inspired */
 [data-theme="dark"] {
-  --color-primary: #8a2be2;
-  --color-primary-hover: #9a4eea;
-  --color-primary-light: #b56ef5;
+  --color-primary: #0A84FF;
+  --color-primary-hover: #409CFF;
+  --color-primary-light: #64B5F6;
   
-  --color-background: #0d1117;
-  --color-background-secondary: #161b22;
-  --color-background-tertiary: #21262d;
+  --color-background: #000000;
+  --color-background-secondary: #1c1c1e;
+  --color-background-tertiary: #2c2c2e;
   
-  --color-surface: #161b22;
-  --color-surface-hover: #21262d;
-  --color-surface-elevated: #30363d;
+  --color-surface: #1c1c1e;
+  --color-surface-hover: #2c2c2e;
+  --color-surface-elevated: #3a3a3c;
   
-  --color-text-primary: #f0f6fc;
-  --color-text-secondary: #8b949e;
-  --color-text-tertiary: #6e7681;
-  --color-text-inverse: #0d1117;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #8e8e93;
+  --color-text-tertiary: #48484a;
+  --color-text-inverse: #000000;
   
-  --color-border: #30363d;
-  --color-border-light: #21262d;
-  --color-border-dark: #6e7681;
+  --color-border: #38383a;
+  --color-border-light: #2c2c2e;
+  --color-border-dark: #48484a;
   
-  --color-success: #2ea043;
-  --color-warning: #fb8500;
-  --color-error: #f85149;
-  --color-info: #58a6ff;
+  --color-success: #32d74b;
+  --color-warning: #ff9f0a;
+  --color-error: #ff453a;
+  --color-info: #64d2ff;
   
   /* Dark theme shadows */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -142,11 +142,11 @@ html {
 
 .form-control:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 0.2rem rgba(106, 13, 173, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(0, 122, 255, 0.25);
 }
 
 [data-theme="dark"] .form-control:focus {
-  box-shadow: 0 0 0 0.2rem rgba(138, 43, 226, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(10, 132, 255, 0.25);
 }
 
 /* Utility Classes */
