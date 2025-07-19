@@ -34,29 +34,21 @@
     z-index: 10;
 }
 
-/* Home content card */
-.home-content-card {
-    background: var(--color-surface);
-    border-radius: var(--border-radius-xl);
-    padding: 60px 40px;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--color-border);
-    backdrop-filter: blur(10px);
-    position: relative;
-    z-index: 1;
-    max-width: 900px;
-    margin: 0 auto;
+
+/* Fluid home content – spans full width */
+.home-content {
+    max-width: 1200px; /* keep readable max width */
+    margin-inline: auto;
 }
 
 @media (max-width: 768px) {
-    .home-content-card {
-        padding: 40px 20px;
-        margin: 0 20px;
+    .home-content {
+        padding-inline: 1rem;
     }
 }
 
 .text-white {
-    color: var(--color-text-primary);
+    color: var(--color-text-primary) !important;
     text-shadow: none;
 }
 
@@ -80,7 +72,7 @@ p {
 
 
 .paragraph-gap {
-    margin-bottom: 100px;
+    margin-bottom: 40px;
 }
 
 
@@ -103,6 +95,17 @@ p {
     color: var(--color-primary-hover);
 }
 
+/* Align buttons row centrally on all viewports */
+.home-content-card .row {
+    justify-content: center;
+}
+
+/* Center each custom button within its column */
+.custom-button {
+    display: inline-block;
+    min-width: 120px;
+    text-align: center;
+}
 
 
 .fade-in-down {

@@ -1,103 +1,62 @@
-/* Theme Toggle Component Styles */
-
+/* Theme Toggle Button Styles */
 .theme-toggle {
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px 12px;
-  border-radius: var(--border-radius-lg);
-  transition: all var(--transition-fast);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text-secondary);
+  gap: 0.35rem;
+  padding: 4px 8px;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-radius: 9999px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .theme-toggle:hover {
   background-color: var(--color-surface-hover);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-  color: var(--color-text-primary);
 }
 
-.theme-toggle:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+.theme-toggle.light {
+  /* Additional styling if needed */
 }
 
-[data-theme="dark"] .theme-toggle:focus {
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.3);
+.theme-toggle.dark {
+  /* Additional styling if needed */
 }
 
-.theme-toggle:active {
-  transform: translateY(0);
-}
-
-/* Toggle Track */
 .theme-toggle-track {
+  width: 40px;
+  height: 20px;
+  background-color: var(--color-border-light);
+  border-radius: 9999px;
   position: relative;
-  width: 48px;
-  height: 24px;
-  background-color: var(--color-background-tertiary);
-  border-radius: 12px;
-  transition: background-color var(--transition-normal);
-  border: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
+  display: flex;
+  align-items: center;
 }
 
-.theme-toggle.dark .theme-toggle-track {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-/* Toggle Thumb */
 .theme-toggle-thumb {
-  position: absolute;
-  top: 2px;
-  left: 2px;
   width: 18px;
   height: 18px;
-  background-color: var(--color-surface);
+  background-color: var(--color-primary);
   border-radius: 50%;
-  transition: all var(--transition-normal);
+  position: absolute;
+  left: 1px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-sm);
+  color: var(--color-text-inverse);
+  transition: left var(--transition-fast);
 }
 
 .theme-toggle.dark .theme-toggle-thumb {
-  transform: translateX(24px);
-  background-color: var(--color-text-inverse);
+  left: 21px;
 }
 
-/* Theme Icon */
-.theme-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  color: var(--color-text-secondary);
-  transition: all var(--transition-normal);
-}
-
-.theme-toggle.light .theme-icon {
-  color: #ffa500; /* Orange for sun */
-}
-
-.theme-toggle.dark .theme-icon {
-  color: #4169e1; /* Royal blue for moon */
-}
-
-/* Label */
 .theme-toggle-label {
-  font-weight: 500;
-  transition: color var(--transition-normal);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
   user-select: none;
 }
 
