@@ -69,19 +69,30 @@ function Login() {
                 <ThemeToggle />
             </div>
             <Row style={{ height: '100vh' }}>
-                {showImage && (<Col className='bg-img' xs={12} sm={3} md={5} />)}
+                {showImage && (
+                    <Col className='bg-img' xs={12} sm={3} md={5}>
+                        <div className="auth-illustration">
+                            <div className="auth-illustration-icon">
+                                👋
+                            </div>
+                            <h2>Welcome Back</h2>
+                            <p>Sign in to access your productivity dashboard and manage your tasks efficiently.</p>
+                        </div>
+                    </Col>
+                )}
                 <Col xs={12} sm={showImage ? 9 : 12} md={showImage ? 7 : 12} className="form-container">
                     <Container>
                         <Row className="justify-content-center">
-                            <Col className="text-center mb-3">
-                                <img src="./LockIcon.png" alt="Lock Icon" width={64} />
-                                <h1 className="form-heading">Log In</h1>
-                            </Col>
-                        </Row>
-                        <Row className="justify-content-center">
                             <Col md={8}>
+                                <div className="modern-form-container">
+                                    <div className="modern-form-header">
+                                        <div className="modern-lock-icon">
+                                            🔓
+                                        </div>
+                                        <h1 className="form-heading">Log In</h1>
+                                    </div>
                                 <Form onSubmit={handleSubmit}>
-                                    <Form.Group className="mb-3" controlId="formBasicEmail">
+                                    <div className="modern-input-group">
                                         <Form.Label>
                                             <span className="required-field">Email Address</span> <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
@@ -93,9 +104,9 @@ function Login() {
                                             required
                                             className={`input-container ${invalidInput ? 'shake' : ''}`}
                                         />
-                                    </Form.Group>
+                                    </div>
 
-                                    <Form.Group className="mb-4" controlId="formBasicPassword">
+                                    <div className="modern-input-group">
                                         <Form.Label>
                                             <span className="required-field">Password</span> <span style={{ color: 'red' }}>*</span>
                                         </Form.Label>
@@ -112,7 +123,7 @@ function Login() {
                                                 {showPassword ? <FaEye /> : <FaEyeSlash />}
                                             </div>
                                         </div>
-                                    </Form.Group>
+                                    </div>
 
                                     <Form.Group className="mb-4" controlId="formBasicCheckbox">
                                         <Form.Check
@@ -127,11 +138,12 @@ function Login() {
                                     </Button>
                                 </Form>
 
-                                <Row className="mt-3">
-                                    <Col className="text-center">
-                                        <p style={{ fontSize: '1.5rem' }}>Don't have an account? <Link to="/signup">Sign Up</Link></p>
-                                    </Col>
-                                </Row>
+                                    <div className="text-center auth-link-text">
+                                        <p>
+                                            Don't have an account? <Link to="/signup">Sign Up</Link>
+                                        </p>
+                                    </div>
+                                </div>
                             </Col>
                         </Row>
                     </Container>

@@ -6,17 +6,61 @@
     z-index: 100;
 }
 
+/* ===== MODERN MINIMAL BACKGROUND ===== */
 .bg-img {
-    background-image: url(https://img.freepik.com/free-vector/privacy-policy-concept-illustration_114360-7853.jpg?size=626&ext=jpg&ga=GA1.1.603601426.1671537950&semt=sph);
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
+    position: relative;
+    background: var(--color-background);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Login Form Checkbox (Remember Me) */
+/* Subtle pattern overlay */
+.bg-img::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: 
+        radial-gradient(circle at 25% 25%, var(--color-primary) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, var(--color-primary) 0%, transparent 50%);
+    opacity: 0.02;
+    animation: subtle-bg-shift 12s ease-in-out infinite;
+}
+
+/* Minimal floating dots */
+.bg-img::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20% 30%, var(--color-primary), transparent),
+        radial-gradient(2px 2px at 40% 70%, var(--color-primary), transparent),
+        radial-gradient(1px 1px at 90% 40%, var(--color-primary), transparent),
+        radial-gradient(1px 1px at 60% 10%, var(--color-primary), transparent);
+    background-repeat: no-repeat;
+    opacity: 0.1;
+    animation: dots-float 20s ease-in-out infinite;
+}
+
+/* Modern checkbox styling */
 .custom-checkbox .form-check-input {
-    border: 1px solid var(--color-primary);
-    margin-top: 7.5px;
+    border: 1px solid var(--color-border);
+    margin-top: 2px;
+    border-radius: 4px;
+    transition: all var(--transition-fast);
+}
+
+.custom-checkbox .form-check-input:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.custom-checkbox .form-check-label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-left: 0.5rem;
 }
 
 
@@ -25,66 +69,39 @@
     align-items: center;
     justify-content: center;
     background-color: var(--color-background);
+    padding: 2rem 1rem;
 }
 
 .form-heading {
-    font-size: 2.3rem;
+    font-size: 1.75rem;
+    font-weight: 600;
     color: var(--color-text-primary);
-    animation: fadeIn 1s ease-in-out;
+    margin: 0;
+    letter-spacing: -0.5px;
 }
 
 .required-field {
-    font-size: 1.3rem;
-    color: var(--color-primary);
-    animation: fadeIn 1s ease-in-out;
-}
-
-
-.input-container {
-    font-size: 1.2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
     color: var(--color-text-primary);
-    background-color: var(--color-surface);
-    border-color: var(--color-border);
-    animation: slideIn 0.5s ease-in-out;
-    transition: all var(--transition-fast);
-}
-
-.input-container:hover {
-    box-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
-    border-color: var(--color-primary);
-}
-
-.input-container:focus {
-    background-color: var(--color-surface);
-    border-color: var(--color-primary);
-    color: var(--color-text-primary);
-    box-shadow: 0 0 0 0.2rem rgba(0, 122, 255, 0.25);
 }
 
 
-.submit-button {
-    font-size: 1.5rem;
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
-    color: var(--color-text-inverse);
-    animation: growIn 0.5s ease-in-out;
-    transition: all var(--transition-fast);
-}
-
-.submit-button:hover {
-    background-color: var(--color-primary-hover);
-    border-color: var(--color-primary-hover);
-    color: var(--color-text-inverse);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
+/* Old input and button styles - now handled by modern classes above */
 
 
 .password-toggle-icon {
     position: absolute;
     top: 50%;
-    right: 15px;
+    right: 12px;
     transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: color var(--transition-fast);
+}
+
+.password-toggle-icon:hover {
+    color: var(--color-text-primary);
 }
 
 
@@ -95,39 +112,7 @@
 
 
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-@keyframes growIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
+/* Removed old animations - now using subtle modern effects */
 
 
 
@@ -175,4 +160,208 @@
     100% {
         transform: translate(1px, -2px) rotate(-1deg);
     }
+}
+
+/* ===== MINIMAL ILLUSTRATION COMPONENTS ===== */
+.auth-illustration {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: var(--color-text-primary);
+    padding: 3rem 2rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.auth-illustration-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 1.5rem;
+    background: var(--color-primary);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-normal);
+}
+
+.auth-illustration h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--color-text-primary);
+    letter-spacing: -0.5px;
+}
+
+.auth-illustration p {
+    font-size: 1rem;
+    opacity: 0.7;
+    max-width: 280px;
+    margin: 0 auto;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+}
+
+/* Removed particles - now using minimal design */
+
+/* ===== COMPACT MODERN FORM ===== */
+.modern-form-container {
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 400px;
+    margin: 0 auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--color-border);
+    position: relative;
+}
+
+.modern-form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.modern-lock-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 1rem;
+    background: var(--color-primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Compact input styling */
+.modern-input-group {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.modern-input-group .form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.input-container {
+    border-radius: 8px;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-fast);
+    background: var(--color-surface);
+    font-size: 0.875rem;
+    width: 100%;
+}
+
+.input-container:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.input-container:hover {
+    border-color: var(--color-text-tertiary);
+}
+
+/* Compact modern button */
+.submit-button {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    background: var(--color-primary);
+    border: none;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-fast);
+    margin-top: 0.5rem;
+}
+
+.submit-button:hover {
+    background: var(--color-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.submit-button:active {
+    transform: translateY(0);
+}
+
+/* ===== SUBTLE ANIMATIONS ===== */
+@keyframes subtle-bg-shift {
+    0%, 100% { opacity: 0.02; transform: scale(1); }
+    50% { opacity: 0.04; transform: scale(1.05); }
+}
+
+@keyframes dots-float {
+    0%, 100% { opacity: 0.1; transform: translateY(0); }
+    50% { opacity: 0.2; transform: translateY(-5px); }
+}
+
+/* Removed particle animation - using minimal effects only */
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 1rem;
+    }
+    
+    .modern-form-container {
+        padding: 1.5rem;
+        margin: 0 1rem;
+    }
+    
+    .auth-illustration {
+        padding: 2rem 1rem;
+    }
+    
+    .auth-illustration h2 {
+        font-size: 1.5rem;
+    }
+    
+    .auth-illustration p {
+        font-size: 0.875rem;
+    }
+    
+    .auth-illustration-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+    
+    .modern-lock-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+}
+
+/* ===== FORM LINKS STYLING ===== */
+.auth-link-text {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-top: 1.5rem;
+}
+
+.auth-link-text a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-fast);
+}
+
+.auth-link-text a:hover {
+    color: var(--color-primary-hover);
+    text-decoration: underline;
 }
