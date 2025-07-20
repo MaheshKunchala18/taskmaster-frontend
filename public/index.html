@@ -28,6 +28,32 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
   <title>Task Master</title>
+  
+  <!-- Prevent theme flash on page load -->
+  <script>
+    (function() {
+      const getInitialTheme = () => {
+        // Check localStorage first
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+          return savedTheme;
+        }
+        
+        // Fall back to system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return prefersDark ? 'dark' : 'light';
+      };
+
+      const theme = getInitialTheme();
+      document.documentElement.setAttribute('data-theme', theme);
+      
+      // Update meta theme-color for mobile browsers
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', theme === 'dark' ? '#000000' : '#ffffff');
+      }
+    })();
+  </script>
 </head>
 
 <body>

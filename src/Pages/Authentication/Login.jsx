@@ -3,6 +3,7 @@ import { Form, Button, Container, Row, Col } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { AuthContext } from './AuthContext';
+import ThemeToggle from '../../components/ThemeToggle/ThemeToggle';
 import './LoginSignup.css';
 
 function Login() {
@@ -64,6 +65,9 @@ function Login() {
 
     return (
         <Container fluid>
+            <div className="theme-toggle-container">
+                <ThemeToggle />
+            </div>
             <Row style={{ height: '100vh' }}>
                 {showImage && (<Col className='bg-img' xs={12} sm={3} md={5} />)}
                 <Col xs={12} sm={showImage ? 9 : 12} md={showImage ? 7 : 12} className="form-container">

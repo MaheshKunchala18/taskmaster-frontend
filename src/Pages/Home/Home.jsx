@@ -1,13 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import ThemeToggle from '../../components/ThemeToggle/ThemeToggle';
 import './Home.css';
 
 
 function Home() {
     return (
         <div className="App">
-            <Container className="text-center">
+            <div className="theme-toggle-container">
+                <ThemeToggle />
+            </div>
+            <Container fluid className="text-center p-4 home-content">
                 <h1 className="text-white fade-in-down">
                     Welcome to TaskMaster - Your Ultimate Todo List App
                 </h1>
@@ -24,9 +28,6 @@ function Home() {
                             Join with the users who have transformed their productivity 
                             with TaskMaster. Sign up now!
                         </p>
-                        <Link to="/signup">
-                            <Button variant="light" className="custom-button">Signup</Button>
-                        </Link>
                     </Col>
                     <Col xs={12} md={6} className="mb-4 mb-md-0">
                         <h2 className="text-white">Already using TaskMaster?</h2>
@@ -34,6 +35,15 @@ function Home() {
                             Welcome back! Dive into your tasks and let TaskMaster guide you 
                             through your journey towards success.
                         </p>
+                    </Col>
+                </Row>
+                <Row className="fade-in-up">
+                    <Col xs={12} md={6} className="mb-4 mb-md-0">
+                        <Link to="/signup">
+                            <Button variant="light" className="custom-button">Signup</Button>
+                        </Link>
+                    </Col>
+                    <Col xs={12} md={6} className="mb-4 mb-md-0">
                         <Link to="/login">
                             <Button variant="light" className="custom-button">Login</Button>
                         </Link>
