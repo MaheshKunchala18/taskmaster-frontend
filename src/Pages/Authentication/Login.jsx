@@ -71,6 +71,11 @@ function Login() {
             <Row style={{ height: '100vh' }}>
                 {showImage && (
                     <Col className='bg-img' xs={12} sm={3} md={5}>
+                        <div className="auth-particles">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="auth-particle"></div>
+                            ))}
+                        </div>
                         <div className="auth-illustration">
                             <div className="auth-illustration-icon">
                                 👋

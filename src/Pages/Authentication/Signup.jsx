@@ -102,6 +102,11 @@ function Signup() {
             <Row style={{ height: '100vh' }}>
                 {showImage && (
                     <Col className='bg-img' xs={12} sm={3} md={5}>
+                        <div className="auth-particles">
+                            {[...Array(8)].map((_, i) => (
+                                <div key={i} className="auth-particle"></div>
+                            ))}
+                        </div>
                         <div className="auth-illustration">
                             <div className="auth-illustration-icon">
                                 🚀
@@ -186,8 +191,8 @@ function Signup() {
                                                 {showPassword ? <FaEye /> : <FaEyeSlash />}
                                             </div>
                                         </div>
-                                        <p style={{marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: 'var(--color-text-secondary)'}} >Password Strength</p>
-                                        <ProgressBar className="mb-2" striped variant={variant} now={(strength / 4) * 100} label={passwordStrengthMessage} />
+                                        <p style={{marginBottom: '4px', fontSize: '13px', fontWeight: '500', color: 'var(--color-text-secondary)'}} >Password Strength</p>
+                                        <ProgressBar className="mb-1" striped variant={variant} now={(strength / 4) * 100} label={passwordStrengthMessage} style={{height: '6px'}} />
                                     </div>
 
                                     <div className="modern-input-group">
