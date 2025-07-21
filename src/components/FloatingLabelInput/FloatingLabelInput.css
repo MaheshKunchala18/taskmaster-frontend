@@ -7,7 +7,7 @@
 
 .floating-input {
   width: 100%;
-  padding: 1rem 1rem 1rem 3rem;
+  padding: 1rem 1rem 1rem 3.5rem;
   border: 2px solid transparent;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
@@ -60,7 +60,7 @@
 
 .floating-label.float {
   top: -0.5rem;
-  left: 2.5rem;
+  left: 3rem;
   font-size: 0.75rem;
   color: var(--color-primary);
   font-weight: 600;
@@ -199,17 +199,17 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .floating-input {
-    padding: 0.875rem 0.875rem 0.875rem 2.5rem;
+    padding: 0.875rem 0.875rem 0.875rem 3rem;
     font-size: 0.9rem;
   }
   
   .floating-label {
-    left: 2.5rem;
+    left: 3rem;
     font-size: 0.9rem;
   }
   
   .floating-label.float {
-    left: 2rem;
+    left: 2.5rem;
     font-size: 0.7rem;
   }
   
@@ -224,16 +224,16 @@
   }
 }
 
-/* Input with Icon Adjustments */
-.floating-input-container:not(.has-icon) .floating-input {
+/* Input without Icon Adjustments */
+.floating-input-container:not(:has(.floating-input-icon)) .floating-input {
   padding-left: 1rem;
 }
 
-.floating-input-container:not(.has-icon) .floating-label {
+.floating-input-container:not(:has(.floating-input-icon)) .floating-label {
   left: 1rem;
 }
 
-.floating-input-container:not(.has-icon) .floating-label.float {
+.floating-input-container:not(:has(.floating-input-icon)) .floating-label.float {
   left: 0.5rem;
 }
 
