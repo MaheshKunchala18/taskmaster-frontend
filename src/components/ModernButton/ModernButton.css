@@ -1,0 +1,330 @@
+/* Modern Button Styles */
+.modern-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  outline: none;
+  user-select: none;
+  transform: translateY(0);
+}
+
+.modern-button:focus {
+  outline: none;
+  box-shadow: 
+    0 6px 20px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+
+.modern-button:active {
+  transform: translateY(1px);
+}
+
+/* Button Content */
+.modern-button__content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.modern-button__text {
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.modern-button__text--loading {
+  opacity: 0.7;
+  transform: translateX(1rem);
+}
+
+.modern-button__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+/* Loading Animation */
+.modern-button__loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  position: absolute;
+  left: 1rem;
+}
+
+.loader-ring {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: loader-bounce 1.4s ease-in-out infinite both;
+}
+
+.loader-ring:nth-child(1) { animation-delay: -0.32s; }
+.loader-ring:nth-child(2) { animation-delay: -0.16s; }
+.loader-ring:nth-child(3) { animation-delay: 0s; }
+
+/* Ripple Effect */
+.modern-button__ripples {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.modern-button__ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: scale(0);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+/* Glow Effect */
+.modern-button__glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.modern-button:hover .modern-button__glow {
+  opacity: 1;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Button Variants */
+
+/* Primary Button */
+.modern-button--primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modern-button--primary:hover {
+  background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary));
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 25px rgba(0, 122, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.modern-button--primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary Button */
+.modern-button--secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.modern-button--secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+/* Outline Button */
+.modern-button--outline {
+  background: transparent;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+}
+
+.modern-button--outline:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Ghost Button */
+.modern-button--ghost {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid transparent;
+}
+
+.modern-button--ghost:hover {
+  background: rgba(0, 122, 255, 0.1);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* Button Sizes */
+.modern-button--sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 8px;
+}
+
+.modern-button--md {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9rem;
+  border-radius: 10px;
+}
+
+.modern-button--lg {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  border-radius: 12px;
+  width: 100%;
+}
+
+.modern-button--xl {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.1rem;
+  border-radius: 14px;
+  width: 100%;
+}
+
+/* Button States */
+.modern-button--loading {
+  cursor: wait;
+  pointer-events: none;
+}
+
+.modern-button--disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+  background: var(--color-text-tertiary) !important;
+  color: var(--color-text-secondary) !important;
+  border-color: var(--color-border) !important;
+}
+
+.modern-button--disabled:hover {
+  transform: none !important;
+  box-shadow: 
+    0 4px 15px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Dark Theme Adjustments */
+[data-theme="dark"] .modern-button--secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .modern-button--secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .modern-button--ghost:hover {
+  background: rgba(10, 132, 255, 0.15);
+}
+
+[data-theme="dark"] .modern-button__ripple {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animations */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes loader-bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Success and Error Variants */
+.modern-button--success {
+  background: linear-gradient(135deg, var(--color-success), #2ecc71);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modern-button--success:hover {
+  background: linear-gradient(135deg, #2ecc71, var(--color-success));
+  box-shadow: 
+    0 8px 25px rgba(52, 199, 89, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.modern-button--error {
+  background: linear-gradient(135deg, var(--color-error), #ff6b6b);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.modern-button--error:hover {
+  background: linear-gradient(135deg, #ff6b6b, var(--color-error));
+  box-shadow: 
+    0 8px 25px rgba(255, 59, 48, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modern-button--lg,
+  .modern-button--xl {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .modern-button__loader {
+    left: 0.875rem;
+  }
+  
+  .modern-button__text--loading {
+    transform: translateX(0.75rem);
+  }
+}
+
+/* Focus visible for accessibility */
+.modern-button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+} 
