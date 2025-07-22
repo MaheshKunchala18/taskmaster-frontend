@@ -35,7 +35,7 @@ const ModernButton = ({
 
       setRipples(prev => [...prev, newRipple]);
 
-      // Remove ripple after animation
+
       setTimeout(() => {
         setRipples(prev => prev.filter(ripple => ripple.key !== newRipple.key));
       }, 600);

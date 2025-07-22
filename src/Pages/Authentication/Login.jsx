@@ -14,7 +14,6 @@ function Login() {
     const [showImage, setShowImage] = useState(true);
     const [invalidInput, setInvalidInput] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
     const { setUserId } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -47,12 +46,8 @@ function Login() {
             if (response.ok) {
                 const data = await response.json();
                 localStorage.setItem('userId', data.userId);
-                if (rememberMe) {
-                    localStorage.setItem('rememberMe', 'true');
-                }
                 setUserId(data.userId);
                 
-                // Add a small delay for better UX
                 setTimeout(() => {
                     navigate('/tasks');
                 }, 800);
@@ -131,20 +126,6 @@ function Login() {
                                             placeholder="Enter your password"
                                         />
 
-                                        <Form.Group className="mb-4" controlId="formBasicCheckbox">
-                                            <Form.Check
-                                                type="checkbox"
-                                                checked={rememberMe}
-                                                onChange={(e) => setRememberMe(e.target.checked)}
-                                                label={
-                                                    <span style={{ fontSize: '0.95rem', fontWeight: '500' }}>
-                                                        Remember me for 30 days
-                                                    </span>
-                                                }
-                                                className='custom-checkbox'
-                                            />
-                                        </Form.Group>
-
                                         {invalidInput && (
                                             <div style={{
                                                 background: 'rgba(255, 59, 48, 0.1)',
@@ -174,12 +155,7 @@ function Login() {
 
                                     <div className="auth-link-text">
                                         <p>
-                                            Don't have an account? <Link to="/signup">Create Account</Link>
-                                        </p>
-                                        <p style={{ marginTop: '0.5rem' }}>
-                                            <Link to="/forgot-password" style={{ fontSize: '0.875rem' }}>
-                                                Forgot your password?
-                                            </Link>
+                                            Don't have an account? <Link to="/signup"> Sign Up </Link>
                                         </p>
                                     </div>
                                 </div>

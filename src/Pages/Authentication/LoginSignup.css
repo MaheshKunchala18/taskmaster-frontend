@@ -1,6 +1,6 @@
-/* Ultra Modern Authentication Styles */
 
-/* Theme Toggle for Auth Pages */
+
+
 .theme-toggle-container {
     position: absolute;
     top: 20px;
@@ -9,7 +9,7 @@
     animation: theme-toggle-entrance 1s ease-out 2s both;
 }
 
-/* ===== ENHANCED GLASSMORPHISM BACKGROUND ===== */
+
 .bg-img {
     position: relative;
     background: 
@@ -27,7 +27,7 @@
     justify-content: center;
 }
 
-/* Dynamic animated gradient overlay */
+
 .bg-img::before {
     content: "";
     position: absolute;
@@ -41,7 +41,7 @@
     filter: blur(1px);
 }
 
-/* Enhanced floating particles */
+
 .bg-img::after {
     content: "";
     position: absolute;
@@ -58,7 +58,7 @@
     animation: particles-float 25s ease-in-out infinite;
 }
 
-/* Enhanced form container with glassmorphism */
+
 .form-container {
     display: flex;
     align-items: center;
@@ -71,7 +71,7 @@
         );
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 2rem 1rem;
+    padding: 1rem 1rem;
     position: relative;
 }
 
@@ -100,7 +100,7 @@
     animation: text-glow 3s ease-in-out infinite alternate;
 }
 
-/* ===== ENHANCED ILLUSTRATION COMPONENTS ===== */
+
 .auth-illustration {
     position: relative;
     z-index: 1;
@@ -173,7 +173,6 @@
     animation: text-entrance 1s ease-out 0.7s both;
 }
 
-/* ===== ULTRA MODERN FORM CONTAINER ===== */
 .modern-form-container {
     background: 
         linear-gradient(135deg, 
@@ -184,7 +183,7 @@
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
     border-radius: 20px;
-    padding: 3rem 2.5rem;
+    padding: 2rem 2.5rem;
     max-width: 450px;
     margin: 0 auto;
     box-shadow: 
@@ -221,14 +220,14 @@
 
 .modern-form-header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 2rem;
     animation: header-entrance 1s ease-out 0.3s both;
 }
 
 .modern-lock-icon {
     width: 60px;
     height: 60px;
-    margin: 0 auto 1.5rem;
+    margin: 0 auto 1rem;
     background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
     border-radius: 16px;
     display: flex;
@@ -264,18 +263,7 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-/* ===== ENHANCED CHECKBOX STYLING ===== */
-.custom-checkbox {
-    margin-bottom: 2rem;
-    animation: checkbox-entrance 1s ease-out 0.8s both;
-    transition: all 0.3s ease;
-}
-
-.custom-checkbox:hover {
-    transform: translateX(2px);
-}
-
-.custom-checkbox .form-check-input {
+.form-check-input {
     border: 2px solid rgba(0, 122, 255, 0.3);
     border-radius: 6px;
     width: 20px;
@@ -286,7 +274,7 @@
     cursor: pointer;
 }
 
-.custom-checkbox .form-check-input:checked {
+.form-check-input:checked {
     background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
     border-color: var(--color-primary);
     box-shadow: 
@@ -295,19 +283,19 @@
     transform: scale(1.05);
 }
 
-.custom-checkbox .form-check-input:hover {
+.form-check-input:hover {
     border-color: var(--color-primary);
     transform: scale(1.02);
     box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
 }
 
-.custom-checkbox .form-check-input:focus {
+.form-check-input:focus {
     box-shadow: 
         0 4px 15px rgba(0, 122, 255, 0.3),
         0 0 0 3px rgba(0, 122, 255, 0.1);
 }
 
-.custom-checkbox .form-check-label {
+.form-check-label {
     font-size: 0.95rem;
     color: var(--color-text-secondary);
     margin-left: 0.75rem;
@@ -317,11 +305,11 @@
     user-select: none;
 }
 
-.custom-checkbox .form-check-label:hover {
+.form-check-label:hover {
     color: var(--color-text-primary);
 }
 
-/* ===== MICRO-INTERACTIONS ===== */
+
 .form-container .container .row .col .modern-form-container form > * {
     animation: form-item-entrance 0.6s ease-out both;
 }
@@ -350,7 +338,7 @@
     animation-delay: 0.6s;
 }
 
-/* ===== ENHANCED ANIMATIONS ===== */
+
 @keyframes theme-toggle-entrance {
     0% {
         opacity: 0;
@@ -492,11 +480,11 @@
     }
 }
 
-/* ===== FORM LINKS STYLING ===== */
+
 .auth-link-text {
     font-size: 0.95rem;
     color: var(--color-text-secondary);
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     text-align: center;
     animation: text-entrance 1s ease-out 1s both;
 }
@@ -536,7 +524,7 @@
     transform: translateY(0);
 }
 
-/* ===== ENHANCED ERROR STYLING ===== */
+
 .error-message {
     background: rgba(255, 59, 48, 0.1);
     border: 1px solid rgba(255, 59, 48, 0.3);
@@ -561,7 +549,7 @@
     }
 }
 
-/* ===== DARK THEME ENHANCEMENTS ===== */
+
 [data-theme="dark"] .bg-img {
     background: 
         linear-gradient(135deg, 
@@ -604,7 +592,7 @@
         );
 }
 
-[data-theme="dark"] .custom-checkbox .form-check-input {
+[data-theme="dark"] .form-check-input {
     background: rgba(255, 255, 255, 0.03);
     border-color: rgba(10, 132, 255, 0.4);
 }
@@ -614,14 +602,14 @@
     border-color: rgba(255, 59, 48, 0.4);
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
+
 @media (max-width: 768px) {
     .form-container {
-        padding: 1rem;
+        padding: 0.5rem;
     }
     
     .modern-form-container {
-        padding: 2rem 1.5rem;
+        padding: 1.5rem 1.5rem;
         margin: 0 1rem;
         border-radius: 16px;
     }
@@ -659,7 +647,7 @@
 
 @media (max-width: 480px) {
     .modern-form-container {
-        padding: 1.5rem 1rem;
+        padding: 1rem 1rem;
     }
     
     .auth-illustration {
@@ -676,7 +664,6 @@
     }
 }
 
-/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
 @media (prefers-reduced-motion: reduce) {
     .bg-img::before,
     .bg-img::after,
@@ -691,7 +678,6 @@
     .modern-form-header,
     .auth-illustration h2,
     .auth-illustration p,
-    .custom-checkbox,
     .auth-link-text,
     .form-container .container .row .col .modern-form-container form > * {
         animation: none;
@@ -700,20 +686,19 @@
     .modern-form-container:hover,
     .auth-illustration-icon:hover,
     .modern-lock-icon:hover,
-    .custom-checkbox:hover,
     .auth-link-text a:hover {
         transform: none;
     }
 }
 
-/* ===== FOCUS INDICATORS FOR ACCESSIBILITY ===== */
+
 .modern-lock-icon:focus,
 .auth-illustration-icon:focus {
     outline: 2px solid var(--color-primary);
     outline-offset: 4px;
 }
 
-/* ===== LEGACY SHAKE ANIMATION ===== */
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }

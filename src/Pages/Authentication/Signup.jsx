@@ -22,7 +22,6 @@ function Signup() {
     const [emailError, setEmailError] = useState('');
     const [strength, setStrength] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
-    const [acceptTerms, setAcceptTerms] = useState(false);
 
     const navigate = useNavigate();
     const { setUserId } = useContext(AuthContext);
@@ -44,8 +43,8 @@ function Signup() {
         setPassword(newPassword);
         setStrength(calculateStrength(newPassword));
         setPasswordError('');
-        
-        // Clear confirm password error if passwords now match
+
+
         if (confirmPassword && newPassword === confirmPassword) {
             setInvalidInput(false);
         }
@@ -54,7 +53,7 @@ function Signup() {
     const handleConfirmPasswordChange = (event) => {
         const newConfirmPassword = event.target.value;
         setConfirmPassword(newConfirmPassword);
-        
+
         if (password && newConfirmPassword && password !== newConfirmPassword) {
             setPasswordError('Passwords do not match');
         } else {
@@ -70,7 +69,7 @@ function Signup() {
     const handleEmailChange = (event) => {
         const newEmail = event.target.value;
         setEmail(newEmail);
-        
+
         if (newEmail && !validateEmail(newEmail)) {
             setEmailError('Please enter a valid email address');
         } else {
@@ -84,13 +83,6 @@ function Signup() {
         setInvalidInput(false);
         setPasswordError('');
         setEmailError('');
-
-        // Validation
-        if (!acceptTerms) {
-            setInvalidInput(true);
-            setIsLoading(false);
-            return;
-        }
 
         if (password !== confirmPassword) {
             setPasswordError('Passwords do not match');
@@ -125,8 +117,7 @@ function Signup() {
                 const userId = response.data.userId;
                 localStorage.setItem('userId', userId);
                 setUserId(userId);
-                
-                // Add a small delay for better UX
+
                 setTimeout(() => {
                     navigate('/tasks');
                 }, 800);
@@ -159,9 +150,9 @@ function Signup() {
         };
     }, []);
 
-    const isFormValid = firstName && lastName && email && password && confirmPassword && 
-                       password === confirmPassword && strength >= 2 && acceptTerms && 
-                       !emailError && !passwordError;
+    const isFormValid = firstName && lastName && email && password && confirmPassword &&
+        password === confirmPassword && strength >= 2 &&
+        !emailError && !passwordError;
 
     return (
         <Container fluid>
@@ -190,18 +181,10 @@ function Signup() {
                                             👤
                                         </div>
                                         <h1 className="form-heading">Create Account</h1>
-                                        <p style={{ 
-                                            color: 'var(--color-text-secondary)', 
-                                            margin: '0.5rem 0 0 0',
-                                            fontSize: '0.95rem',
-                                            opacity: 0.8
-                                        }}>
-                                            Join thousands of productive users
-                                        </p>
                                     </div>
 
                                     <Form onSubmit={handleSubmit}>
-                                        <Row className="mb-3">
+                                        <Row>
                                             <Col>
                                                 <FloatingLabelInput
                                                     label="First Name"
@@ -263,9 +246,9 @@ function Signup() {
                                         />
 
                                         {password && (
-                                            <PasswordStrength 
-                                                password={password} 
-                                                strength={strength} 
+                                            <PasswordStrength
+                                                password={password}
+                                                strength={strength}
                                             />
                                         )}
 
@@ -292,27 +275,6 @@ function Signup() {
                                                 {passwordError}
                                             </div>
                                         )}
-
-                                        <Form.Group className="mb-4" controlId="formBasicCheckbox">
-                                            <Form.Check
-                                                type="checkbox"
-                                                checked={acceptTerms}
-                                                onChange={(e) => setAcceptTerms(e.target.checked)}
-                                                label={
-                                                    <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>
-                                                        I agree to the{' '}
-                                                        <Link to="/terms" style={{ color: 'var(--color-primary)' }}>
-                                                            Terms of Service
-                                                        </Link>
-                                                        {' '}and{' '}
-                                                        <Link to="/privacy" style={{ color: 'var(--color-primary)' }}>
-                                                            Privacy Policy
-                                                        </Link>
-                                                    </span>
-                                                }
-                                                className='custom-checkbox'
-                                            />
-                                        </Form.Group>
 
                                         {invalidInput && !passwordError && !emailError && (
                                             <div style={{
@@ -342,8 +304,8 @@ function Signup() {
                                     </Form>
 
                                     <div className="auth-link-text">
-                                        <p>
-                                            Already have an account? <Link to="/login">Sign In</Link>
+                                        <p className='mb-1'>
+                                            Already have an account? <Link to="/login">Log In</Link>
                                         </p>
                                     </div>
                                 </div>
