@@ -20,7 +20,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/tasks" element={<Tasks />} />
-            <Route path="*" element={<NotFound />} /> {/* Catch-all route for 404*/}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

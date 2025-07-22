@@ -1,4 +1,3 @@
-/* Theme Toggle Button Styles */
 .theme-toggle {
   display: flex;
   align-items: center;
@@ -14,14 +13,6 @@
 
 .theme-toggle:hover {
   background-color: var(--color-surface-hover);
-}
-
-.theme-toggle.light {
-  /* Additional styling if needed */
-}
-
-.theme-toggle.dark {
-  /* Additional styling if needed */
 }
 
 .theme-toggle-track {

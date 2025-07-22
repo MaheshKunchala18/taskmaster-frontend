@@ -6,7 +6,7 @@ const ThemeToggle = () => {
   const { theme, toggleTheme, isLoading } = useTheme();
 
   if (isLoading) {
-    return null; // Prevent flash during initial load
+    return null;
   }
 
   return (
