@@ -11,7 +11,7 @@
     position: relative;
 }
 
-/* Add subtle background pattern for visual interest */
+
 .App::before {
     content: '';
     position: absolute;
@@ -26,7 +26,7 @@
     pointer-events: none;
 }
 
-/* Theme toggle positioning */
+
 .theme-toggle-container {
     position: absolute;
     top: 20px;
@@ -35,10 +35,10 @@
 }
 
 
-/* Fluid home content – spans full width */
+
 .home-content {
     max-width: 1200px;
-    /* keep readable max width */
+
     margin-inline: auto;
 }
 
@@ -96,12 +96,12 @@ p {
     color: var(--color-primary-hover);
 }
 
-/* Align buttons row centrally on all viewports */
+
 .home-content-card .row {
     justify-content: center;
 }
 
-/* Center each custom button within its column */
+
 .custom-button {
     display: inline-block;
     min-width: 120px;

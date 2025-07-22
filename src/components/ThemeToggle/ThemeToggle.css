@@ -1,4 +1,3 @@
-/* Theme Toggle Button Styles */
 .theme-toggle {
   display: flex;
   align-items: center;
@@ -14,14 +13,6 @@
 
 .theme-toggle:hover {
   background-color: var(--color-surface-hover);
-}
-
-.theme-toggle.light {
-  /* Additional styling if needed */
-}
-
-.theme-toggle.dark {
-  /* Additional styling if needed */
 }
 
 .theme-toggle-track {
@@ -60,38 +51,38 @@
   user-select: none;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .theme-toggle {
     padding: 6px 10px;
     gap: 8px;
   }
-  
+
   .theme-toggle-track {
     width: 42px;
     height: 22px;
   }
-  
+
   .theme-toggle-thumb {
     width: 16px;
     height: 16px;
   }
-  
+
   .theme-toggle.dark .theme-toggle-thumb {
     transform: translateX(20px);
   }
-  
+
   .theme-icon {
     width: 14px;
     height: 14px;
   }
-  
+
   .theme-toggle-label {
     font-size: 13px;
   }
 }
 
-/* Compact version for smaller spaces */
+
 .theme-toggle.compact {
   padding: 4px 8px;
   gap: 6px;
@@ -120,7 +111,7 @@
   font-size: 12px;
 }
 
-/* Icon only version */
+
 .theme-toggle.icon-only {
   padding: 8px;
   gap: 0;
@@ -133,7 +124,7 @@
   display: none;
 }
 
-/* Animation for icon changes */
+
 .theme-icon svg {
   transition: all var(--transition-fast);
 }
@@ -142,8 +133,9 @@
   transform: scale(1.1);
 }
 
-/* Accessibility improvements */
+
 @media (prefers-reduced-motion: reduce) {
+
   .theme-toggle,
   .theme-toggle-track,
   .theme-toggle-thumb,
@@ -151,4 +143,4 @@
   .theme-icon svg {
     transition: none;
   }
-} 
+}

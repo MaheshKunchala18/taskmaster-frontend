@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Form, Button, Container, Row, Col, ProgressBar } from 'react-bootstrap';
+import { Container, Row, Col, Form } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
 import { AuthContext } from './AuthContext';
 import ThemeToggle from '../../components/ThemeToggle/ThemeToggle';
+import FloatingLabelInput from '../../components/FloatingLabelInput/FloatingLabelInput';
+import ModernButton from '../../components/ModernButton/ModernButton';
+import PasswordStrength from '../../components/PasswordStrength/PasswordStrength';
 import axios from "axios";
 import './LoginSignup.css';
 
@@ -15,8 +18,10 @@ function Signup() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showImage, setShowImage] = useState(true);
     const [invalidInput, setInvalidInput] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
+    const [emailError, setEmailError] = useState('');
     const [strength, setStrength] = useState(0);
-    const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
     const { setUserId } = useContext(AuthContext);
@@ -24,7 +29,7 @@ function Signup() {
     const calculateStrength = (password) => {
         let strength = 0;
         const criteria = [
-            (password) => password.length > 4,
+            (password) => password.length >= 6,
             (password) => /\d/.test(password),
             (password) => /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>?]+/.test(password),
             (password) => /[A-Z]/.test(password),
@@ -34,29 +39,69 @@ function Signup() {
     };
 
     const handlePasswordChange = (event) => {
-        const password = event.target.value;
-        setPassword(password);
-        setStrength(calculateStrength(password));
+        const newPassword = event.target.value;
+        setPassword(newPassword);
+        setStrength(calculateStrength(newPassword));
+        setPasswordError('');
+
+
+        if (confirmPassword && newPassword === confirmPassword) {
+            setInvalidInput(false);
+        }
     };
 
-    const handleTogglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
+    const handleConfirmPasswordChange = (event) => {
+        const newConfirmPassword = event.target.value;
+        setConfirmPassword(newConfirmPassword);
+
+        if (password && newConfirmPassword && password !== newConfirmPassword) {
+            setPasswordError('Passwords do not match');
+        } else {
+            setPasswordError('');
+        }
     };
 
-    let variant;
-    if (strength <= 1) variant = 'danger';
-    else if (strength <= 2) variant = 'warning';
-    else if (strength <= 3) variant = 'info';
-    else variant = 'success';
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
 
-    const passwordStrengthMessage =
-        strength === 0 ? 'Password Strength' : strength === 1 ? 'Very Weak' : strength === 2 ? 'Weak' : strength === 3 ? 'Good' : 'Strong';
+    const handleEmailChange = (event) => {
+        const newEmail = event.target.value;
+        setEmail(newEmail);
+
+        if (newEmail && !validateEmail(newEmail)) {
+            setEmailError('Please enter a valid email address');
+        } else {
+            setEmailError('');
+        }
+    };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setIsLoading(true);
+        setInvalidInput(false);
+        setPasswordError('');
+        setEmailError('');
+
         if (password !== confirmPassword) {
+            setPasswordError('Passwords do not match');
             setInvalidInput(true);
-            setTimeout(() => setInvalidInput(false), 1000);
+            setIsLoading(false);
+            return;
+        }
+
+        if (strength < 2) {
+            setPasswordError('Please choose a stronger password');
+            setInvalidInput(true);
+            setIsLoading(false);
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            setEmailError('Please enter a valid email address');
+            setInvalidInput(true);
+            setIsLoading(false);
             return;
         }
 
@@ -72,13 +117,24 @@ function Signup() {
                 const userId = response.data.userId;
                 localStorage.setItem('userId', userId);
                 setUserId(userId);
-                navigate('/tasks');
+
+                setTimeout(() => {
+                    navigate('/tasks');
+                }, 800);
             } else {
                 console.error('Signup failed');
+                setInvalidInput(true);
             }
 
         } catch (error) {
             console.error('Error signing up:', error);
+            if (error.response?.status === 409) {
+                setEmailError('An account with this email already exists');
+            } else {
+                setInvalidInput(true);
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -94,111 +150,165 @@ function Signup() {
         };
     }, []);
 
+    const isFormValid = firstName && lastName && email && password && confirmPassword &&
+        password === confirmPassword && strength >= 2 &&
+        !emailError && !passwordError;
+
     return (
         <Container fluid>
             <div className="theme-toggle-container">
                 <ThemeToggle />
             </div>
             <Row style={{ height: '100vh' }}>
-                {showImage && (<Col className='bg-img' xs={12} sm={3} md={5} />)}
+                {showImage && (
+                    <Col className='bg-img' xs={12} sm={3} md={5}>
+                        <div className="auth-illustration">
+                            <div className="auth-illustration-icon">
+                                🚀
+                            </div>
+                            <h2>Join TaskMaster</h2>
+                            <p>Create your account to start organizing your tasks and boost your productivity with our modern, intuitive interface.</p>
+                        </div>
+                    </Col>
+                )}
                 <Col xs={12} sm={showImage ? 9 : 12} md={showImage ? 7 : 12} className="form-container">
                     <Container>
                         <Row className="justify-content-center">
-                            <Col className="text-center mt-2 mb-1">
-                                <img src="./LockIcon.png" alt="Lock Icon" width={64} />
-                                <h1 className="form-heading">Sign Up</h1>
-                            </Col>
-                        </Row>
-                        <Row className="justify-content-center">
                             <Col md={8}>
-                                <Form onSubmit={handleSubmit}>
-                                    <Row className="mb-3">
-                                        <Form.Group as={Col} controlId="formBasicFirstName">
-                                            <Form.Label>
-                                                <span className="required-field">First Name</span> <span style={{ color: 'red' }}>*</span>
-                                            </Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Enter first name"
-                                                value={firstName}
-                                                onChange={(e) => setFirstName(e.target.value)}
-                                                required
-                                                className="input-container"
-                                            />
-                                        </Form.Group>
-                                        <Form.Group as={Col} controlId="formBasicLastName">
-                                            <Form.Label>
-                                                <span className="required-field">Last Name</span> <span style={{ color: 'red' }}>*</span>
-                                            </Form.Label>
-                                            <Form.Control
-                                                type="text"
-                                                placeholder="Enter last name"
-                                                value={lastName}
-                                                onChange={(e) => setLastName(e.target.value)}
-                                                required
-                                                className="input-container"
-                                            />
-                                        </Form.Group>
-                                    </Row>
-                                    <Form.Group className="mb-3" controlId="formBasicEmail">
-                                        <Form.Label>
-                                            <span className="required-field">Email Address</span> <span style={{ color: 'red' }}>*</span>
-                                        </Form.Label>
-                                        <Form.Control
-                                            type="email"
-                                            placeholder="Enter email"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            required
-                                            className="input-container"
-                                        />
-                                    </Form.Group>
-
-                                    <Form.Group className="mb-3" controlId="formBasicPassword">
-                                        <Form.Label>
-                                            <span className="required-field">Password</span> <span style={{ color: 'red' }}>*</span>
-                                        </Form.Label>
-                                        <div style={{ position: 'relative' }}>
-                                            <Form.Control
-                                                type={showPassword ? 'text' : 'password'}
-                                                placeholder="Enter password"
-                                                value={password}
-                                                onChange={handlePasswordChange}
-                                                required
-                                                className={`input-container ${invalidInput ? 'shake' : ''}`}
-                                            />
-                                            <div className="password-toggle-icon" onClick={handleTogglePasswordVisibility}>
-                                                {showPassword ? <FaEye /> : <FaEyeSlash />}
-                                            </div>
+                                <div className="modern-form-container">
+                                    <div className="modern-form-header">
+                                        <div className="modern-lock-icon">
+                                            👤
                                         </div>
-                                    </Form.Group>
+                                        <h1 className="form-heading">Create Account</h1>
+                                    </div>
 
-                                    <p style={{marginBottom: '2px', fontSize: '15px', fontWeight: '400'}} >Password Strength</p>
-                                    <ProgressBar className="mb-3" striped variant={variant} now={(strength / 4) * 100} label={passwordStrengthMessage} />
+                                    <Form onSubmit={handleSubmit}>
+                                        <Row>
+                                            <Col>
+                                                <FloatingLabelInput
+                                                    label="First Name"
+                                                    type="text"
+                                                    value={firstName}
+                                                    onChange={(e) => setFirstName(e.target.value)}
+                                                    required
+                                                    icon={<FaUser />}
+                                                    placeholder="Enter your first name"
+                                                />
+                                            </Col>
+                                            <Col>
+                                                <FloatingLabelInput
+                                                    label="Last Name"
+                                                    type="text"
+                                                    value={lastName}
+                                                    onChange={(e) => setLastName(e.target.value)}
+                                                    required
+                                                    icon={<FaUser />}
+                                                    placeholder="Enter your last name"
+                                                />
+                                            </Col>
+                                        </Row>
 
-                                    <Form.Group className="mb-4" controlId="formConfirmPassword">
-                                        <Form.Label>
-                                            <span className="required-field">Confirm Password</span> <span style={{ color: 'red' }}>*</span>
-                                        </Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            placeholder="Confirm password"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                        <FloatingLabelInput
+                                            label="Email Address"
+                                            type="email"
+                                            value={email}
+                                            onChange={handleEmailChange}
                                             required
-                                            className={`input-container ${invalidInput ? 'shake' : ''}`}
+                                            error={!!emailError}
+                                            icon={<FaEnvelope />}
+                                            placeholder="Enter your email"
                                         />
-                                    </Form.Group>
 
-                                    <Button variant="primary" type="submit" size="lg" className="submit-button">
-                                        SIGN UP
-                                    </Button>
-                                </Form>
-                                <Row className="mt-3">
-                                    <Col className="text-center">
-                                        <p className="mb-2" style={{ fontSize: '1.5rem' }}>Already have an account? <Link to="/login">Log In</Link></p>
-                                    </Col>
-                                </Row>
+                                        {emailError && (
+                                            <div style={{
+                                                color: 'var(--color-error)',
+                                                fontSize: '0.8rem',
+                                                marginTop: '-1rem',
+                                                marginBottom: '1rem',
+                                                paddingLeft: '3rem',
+                                                animation: 'shake 0.5s ease-in-out'
+                                            }}>
+                                                {emailError}
+                                            </div>
+                                        )}
+
+                                        <FloatingLabelInput
+                                            label="Password"
+                                            type="password"
+                                            value={password}
+                                            onChange={handlePasswordChange}
+                                            required
+                                            error={!!passwordError}
+                                            showPasswordToggle={true}
+                                            icon={<FaLock />}
+                                            placeholder="Create a strong password"
+                                        />
+
+                                        {password && (
+                                            <PasswordStrength
+                                                password={password}
+                                                strength={strength}
+                                            />
+                                        )}
+
+                                        <FloatingLabelInput
+                                            label="Confirm Password"
+                                            type="password"
+                                            value={confirmPassword}
+                                            onChange={handleConfirmPasswordChange}
+                                            required
+                                            error={!!passwordError}
+                                            icon={<FaLock />}
+                                            placeholder="Confirm your password"
+                                        />
+
+                                        {passwordError && (
+                                            <div style={{
+                                                color: 'var(--color-error)',
+                                                fontSize: '0.8rem',
+                                                marginTop: '-1rem',
+                                                marginBottom: '1rem',
+                                                paddingLeft: '3rem',
+                                                animation: 'shake 0.5s ease-in-out'
+                                            }}>
+                                                {passwordError}
+                                            </div>
+                                        )}
+
+                                        {invalidInput && !passwordError && !emailError && (
+                                            <div style={{
+                                                background: 'rgba(255, 59, 48, 0.1)',
+                                                border: '1px solid rgba(255, 59, 48, 0.3)',
+                                                borderRadius: '8px',
+                                                padding: '0.75rem',
+                                                marginBottom: '1rem',
+                                                color: 'var(--color-error)',
+                                                fontSize: '0.875rem',
+                                                textAlign: 'center',
+                                                animation: 'shake 0.5s ease-in-out'
+                                            }}>
+                                                ❌ Please accept the terms and conditions to continue.
+                                            </div>
+                                        )}
+
+                                        <ModernButton
+                                            type="submit"
+                                            variant="primary"
+                                            size="lg"
+                                            loading={isLoading}
+                                            disabled={!isFormValid}
+                                        >
+                                            {isLoading ? 'Creating Account...' : 'Create Account'}
+                                        </ModernButton>
+                                    </Form>
+
+                                    <div className="auth-link-text">
+                                        <p className='mb-1'>
+                                            Already have an account? <Link to="/login">Log In</Link>
+                                        </p>
+                                    </div>
+                                </div>
                             </Col>
                         </Row>
                     </Container>

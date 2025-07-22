@@ -149,7 +149,7 @@ function Tasks() {
         localStorage.removeItem('userId');
         setTimeout(() => {
             navigate('/');
-        }, 500); // Wait for 0.5 second before redirecting
+        }, 500);
     }
 
     const profilePopover = (

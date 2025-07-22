@@ -80,7 +80,7 @@
     }
 }
 
-/* Responsive design */
+
 @media (max-width: 768px) {
     .not-found-title {
         font-size: 6rem;
