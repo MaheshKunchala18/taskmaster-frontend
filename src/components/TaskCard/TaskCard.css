@@ -1,0 +1,454 @@
+.task-card {
+  position: relative;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  overflow: hidden;
+  transform: translateY(0);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.task-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Variant Styles */
+.task-card--due {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 100%);
+  border-left: 4px solid var(--color-primary);
+}
+
+.task-card--overdue {
+  background: linear-gradient(135deg, 
+    rgba(255, 59, 48, 0.1) 0%, 
+    rgba(255, 149, 0, 0.05) 100%);
+  border-left: 4px solid var(--color-error);
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+.task-card--completed {
+  background: linear-gradient(135deg, 
+    rgba(52, 199, 89, 0.1) 0%, 
+    rgba(48, 209, 88, 0.05) 100%);
+  border-left: 4px solid var(--color-success);
+  opacity: 0.8;
+}
+
+.task-card--dragging {
+  transform: rotate(5deg) scale(1.05);
+  z-index: 1000;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Background Effects */
+.task-card__glow {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent);
+  border-radius: 22px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.task-card:hover .task-card__glow {
+  opacity: 1;
+  animation: rotate-glow 3s linear infinite;
+}
+
+.task-card__shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.task-card:hover .task-card__shimmer {
+  left: 100%;
+}
+
+/* Drag Handle */
+.task-card__drag-handle {
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  opacity: 0;
+  transition: all 0.3s ease;
+  cursor: grab;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.task-card:hover .task-card__drag-handle {
+  opacity: 1;
+}
+
+.task-card__drag-handle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-secondary);
+}
+
+.task-card__drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Header */
+.task-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.task-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.task-card--due .task-card__icon {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+}
+
+.task-card--overdue .task-card__icon {
+  background: linear-gradient(135deg, var(--color-error), #ff6b6b);
+  color: white;
+  box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+  animation: pulse-icon 2s ease-in-out infinite;
+}
+
+.task-card--completed .task-card__icon {
+  background: linear-gradient(135deg, var(--color-success), #2ecc71);
+  color: white;
+  box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3);
+}
+
+.task-card__relative-time {
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  backdrop-filter: blur(10px);
+}
+
+/* Content */
+.task-card__content {
+  margin-bottom: 1rem;
+}
+
+.task-card__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+
+.task-card--completed .task-card__title {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.task-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.task-card__date-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.task-card__date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.task-card__date--created {
+  opacity: 0.7;
+}
+
+.task-card__meta-icon {
+  opacity: 0.6;
+  font-size: 0.75rem;
+}
+
+/* Progress Bar */
+.task-card__progress {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.task-card__progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  border-radius: 2px;
+  width: 0%;
+  animation: progress-pulse 2s ease-in-out infinite;
+}
+
+/* Actions */
+.task-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-top: 1rem;
+}
+
+.task-card__actions--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.task-card__action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.task-card__action span {
+  font-size: 0.75rem;
+}
+
+.task-card__action--edit {
+  background: rgba(0, 122, 255, 0.1);
+  color: var(--color-primary);
+  border: 1px solid rgba(0, 122, 255, 0.2);
+}
+
+.task-card__action--edit:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+}
+
+.task-card__action--complete {
+  background: rgba(52, 199, 89, 0.1);
+  color: var(--color-success);
+  border: 1px solid rgba(52, 199, 89, 0.2);
+}
+
+.task-card__action--complete:hover {
+  background: var(--color-success);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(52, 199, 89, 0.3);
+}
+
+.task-card__action--delete {
+  background: rgba(255, 59, 48, 0.1);
+  color: var(--color-error);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+}
+
+.task-card__action--delete:hover {
+  background: var(--color-error);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+}
+
+/* Completion Overlay */
+.task-card__completion-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(52, 199, 89, 0.1) 0%, 
+    rgba(48, 209, 88, 0.05) 100%);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+}
+
+.task-card__completion-check {
+  width: 60px;
+  height: 60px;
+  background: var(--color-success);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: completion-bounce 0.6s ease-out;
+  box-shadow: 0 8px 25px rgba(52, 199, 89, 0.4);
+}
+
+.task-card__completion-icon {
+  font-size: 1.5rem;
+  color: white;
+}
+
+/* Animations */
+@keyframes pulse-warning {
+  0%, 100% {
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 0 0 0 rgba(255, 59, 48, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 0 0 8px rgba(255, 59, 48, 0.1);
+  }
+}
+
+@keyframes pulse-icon {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes rotate-glow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progress-pulse {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+
+@keyframes completion-bounce {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] .task-card {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.05) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .task-card__relative-time {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .task-card__action {
+  backdrop-filter: blur(20px);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .task-card {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .task-card__title {
+    font-size: 1rem;
+  }
+
+  .task-card__actions {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .task-card__action {
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  .task-card__action span {
+    display: none;
+  }
+
+  .task-card__drag-handle {
+    display: none;
+  }
+} 
