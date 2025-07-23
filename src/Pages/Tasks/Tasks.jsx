@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Modal, Form } from 'react-bootstrap';
+import { Container, Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -8,9 +8,10 @@ import {
   faTasks, 
   faExclamationTriangle,
   faCheckCircle,
-  faFilter,
   faSearch,
-  faChevronDown
+  faChevronDown,
+  faClock,
+  faCalendarAlt
 } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import TaskCard from '../../components/TaskCard/TaskCard';
@@ -32,9 +33,10 @@ function TasksContent() {
     const [selectedTask, setSelectedTask] = useState(null);
     const [userName, setUserName] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
-    const [filterBy, setFilterBy] = useState('all');
+    const [activeCategory, setActiveCategory] = useState('due');
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     const [userData, setUserData] = useState({
         username: '',
@@ -186,19 +188,48 @@ function TasksContent() {
         });
     };
 
-    const filteredTasks = (taskList) => {
+    const getActiveTaskList = () => {
+        switch (activeCategory) {
+            case 'overdue':
+                return overdueTasks;
+            case 'completed':
+                return completedTasks;
+            default:
+                return tasks;
+        }
+    };
+
+    const filteredTasks = () => {
+        const taskList = getActiveTaskList();
         return taskList.filter(task => 
             task.task_detail.toLowerCase().includes(searchTerm.toLowerCase())
         );
     };
 
-    const getTaskCounts = () => {
-        return {
-            total: tasks.length + overdueTasks.length + completedTasks.length,
-            overdue: overdueTasks.length,
-            due: tasks.length,
-            completed: completedTasks.length
-        };
+    const getCategoryInfo = (category) => {
+        switch (category) {
+            case 'overdue':
+                return {
+                    icon: faExclamationTriangle,
+                    label: 'Overdue',
+                    count: overdueTasks.length,
+                    variant: 'overdue'
+                };
+            case 'completed':
+                return {
+                    icon: faCheckCircle,
+                    label: 'Completed',
+                    count: completedTasks.length,
+                    variant: 'completed'
+                };
+            default:
+                return {
+                    icon: faClock,
+                    label: 'Due Soon',
+                    count: tasks.length,
+                    variant: 'due'
+                };
+        }
     };
 
     if (isLoading) {
@@ -210,7 +241,8 @@ function TasksContent() {
         );
     }
 
-    const counts = getTaskCounts();
+    const currentCategory = getCategoryInfo(activeCategory);
+    const displayTasks = filteredTasks();
 
     return (
         <div className="modern-tasks-page">
@@ -220,186 +252,186 @@ function TasksContent() {
                 <div className="tasks-background__particles"></div>
             </div>
 
-            <Container fluid className="tasks-container">
-                {/* Header Section */}
-                <div className="tasks-header">
-                    <div className="tasks-header__content">
-                        <div className="tasks-header__main">
-                            <h1 className="tasks-header__title">
-                                <FontAwesomeIcon icon={faTasks} className="tasks-header__icon" />
-                                Your Tasks
-                            </h1>
-                            <p className="tasks-header__subtitle">
-                                Welcome back, {userName}! You have {counts.total} tasks to manage.
-                            </p>
-                        </div>
-                        
-                        <div className="tasks-header__actions">
-                            <ModernButton
-                                variant="primary"
-                                size="lg"
-                                icon={<FontAwesomeIcon icon={faPlus} />}
-                                onClick={() => setShowModal(true)}
-                                className="tasks-header__add-btn"
-                            >
-                                Add Task
-                            </ModernButton>
+            <div className="tasks-layout">
+                {/* Sidebar Navigation */}
+                <aside className={`tasks-sidebar ${isSidebarCollapsed ? 'tasks-sidebar--collapsed' : ''}`}>
+                    <div className="sidebar-header">
+                        <button 
+                            className="sidebar-toggle"
+                            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                        >
+                            <FontAwesomeIcon icon={faTasks} />
+                        </button>
+                        {!isSidebarCollapsed && (
+                            <h3 className="sidebar-title">Categories</h3>
+                        )}
+                    </div>
 
-                            <div className="tasks-header__profile">
-                                <button 
-                                    className="tasks-profile-trigger"
-                                    onClick={() => {
-                                        updateUserData();
-                                        setShowProfileDropdown(!showProfileDropdown);
-                                    }}
+                    <nav className="sidebar-nav">
+                        {['due', 'overdue', 'completed'].map((category) => {
+                            const categoryInfo = getCategoryInfo(category);
+                            return (
+                                <button
+                                    key={category}
+                                    className={`sidebar-nav-item ${activeCategory === category ? 'sidebar-nav-item--active' : ''}`}
+                                    onClick={() => setActiveCategory(category)}
                                 >
-                                    <FontAwesomeIcon icon={faUserCircle} />
-                                    <FontAwesomeIcon icon={faChevronDown} className="profile-chevron" />
-                                </button>
-
-                                {showProfileDropdown && (
-                                    <div className="tasks-profile-dropdown">
-                                        <div className="profile-dropdown__header">
-                                            <h4>{userData.username}</h4>
+                                    <div className="nav-item-content">
+                                        <div className="nav-item-icon">
+                                            <FontAwesomeIcon icon={categoryInfo.icon} />
                                         </div>
-                                        <div className="profile-dropdown__stats">
-                                            <div className="stat-item">
-                                                <span className="stat-label">Overdue</span>
-                                                <span className="stat-value stat-value--danger">{userData.overdue}</span>
-                                            </div>
-                                            <div className="stat-item">
-                                                <span className="stat-label">Due</span>
-                                                <span className="stat-value stat-value--primary">{userData.due}</span>
-                                            </div>
-                                            <div className="stat-item">
-                                                <span className="stat-label">Completed</span>
-                                                <span className="stat-value stat-value--success">{userData.completed}</span>
-                                            </div>
-                                        </div>
-                                        <ModernButton
-                                            variant="error"
-                                            size="sm"
-                                            onClick={handleLogOut}
-                                            className="profile-dropdown__logout"
-                                        >
-                                            Logout
-                                        </ModernButton>
+                                        {!isSidebarCollapsed && (
+                                            <>
+                                                <span className="nav-item-label">{categoryInfo.label}</span>
+                                                <span className="nav-item-count">{categoryInfo.count}</span>
+                                            </>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                                    {activeCategory === category && (
+                                        <div className="nav-item-indicator"></div>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </nav>
 
-                    {/* Search and Filter Bar */}
-                    <div className="tasks-controls">
-                        <div className="tasks-search">
-                            <FontAwesomeIcon icon={faSearch} className="search-icon" />
-                            <input
-                                type="text"
-                                placeholder="Search tasks..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="search-input"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Tasks Grid */}
-                <div className="tasks-grid">
-                    {/* Overdue Tasks */}
-                    <div className="tasks-column tasks-column--overdue">
-                        <div className="tasks-column__header">
-                            <div className="column-header__icon">
-                                <FontAwesomeIcon icon={faExclamationTriangle} />
-                            </div>
-                            <h3 className="column-header__title">Overdue</h3>
-                            <div className="column-header__count">{overdueTasks.length}</div>
-                        </div>
-                        
-                        <div className="tasks-column__content">
-                            {filteredTasks(overdueTasks).length === 0 ? (
-                                <div className="tasks-empty">
-                                    <p>No overdue tasks</p>
+                    {!isSidebarCollapsed && (
+                        <div className="sidebar-footer">
+                            <div className="sidebar-stats">
+                                <div className="stat-item">
+                                    <span className="stat-label">Total Tasks</span>
+                                    <span className="stat-value">{tasks.length + overdueTasks.length + completedTasks.length}</span>
                                 </div>
-                            ) : (
-                                filteredTasks(overdueTasks).map((task, index) => (
+                            </div>
+                        </div>
+                    )}
+                </aside>
+
+                {/* Main Content */}
+                <main className="tasks-main">
+                    {/* Header */}
+                    <header className="tasks-header">
+                        <div className="tasks-header__content">
+                            <div className="tasks-header__left">
+                                <h1 className="tasks-header__title">
+                                    <FontAwesomeIcon icon={currentCategory.icon} className="tasks-header__icon" />
+                                    {currentCategory.label}
+                                </h1>
+                                <p className="tasks-header__subtitle">
+                                    Welcome back, {userName}! You have {currentCategory.count} {currentCategory.label.toLowerCase()} tasks.
+                                </p>
+                            </div>
+                            
+                            <div className="tasks-header__right">
+                                <div className="tasks-search">
+                                    <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search tasks..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="search-input"
+                                    />
+                                </div>
+
+                                <ModernButton
+                                    variant="primary"
+                                    size="lg"
+                                    icon={<FontAwesomeIcon icon={faPlus} />}
+                                    onClick={() => setShowModal(true)}
+                                    className="tasks-header__add-btn"
+                                >
+                                    Add Task
+                                </ModernButton>
+
+                                <div className="tasks-header__profile">
+                                    <button 
+                                        className="tasks-profile-trigger"
+                                        onClick={() => {
+                                            updateUserData();
+                                            setShowProfileDropdown(!showProfileDropdown);
+                                        }}
+                                    >
+                                        <FontAwesomeIcon icon={faUserCircle} />
+                                        <FontAwesomeIcon icon={faChevronDown} className="profile-chevron" />
+                                    </button>
+
+                                    {showProfileDropdown && (
+                                        <div className="tasks-profile-dropdown">
+                                            <div className="profile-dropdown__header">
+                                                <h4>{userData.username}</h4>
+                                            </div>
+                                            <div className="profile-dropdown__stats">
+                                                <div className="stat-item">
+                                                    <span className="stat-label">Overdue</span>
+                                                    <span className="stat-value stat-value--danger">{userData.overdue}</span>
+                                                </div>
+                                                <div className="stat-item">
+                                                    <span className="stat-label">Due</span>
+                                                    <span className="stat-value stat-value--primary">{userData.due}</span>
+                                                </div>
+                                                <div className="stat-item">
+                                                    <span className="stat-label">Completed</span>
+                                                    <span className="stat-value stat-value--success">{userData.completed}</span>
+                                                </div>
+                                            </div>
+                                            <ModernButton
+                                                variant="error"
+                                                size="sm"
+                                                onClick={handleLogOut}
+                                                className="profile-dropdown__logout"
+                                            >
+                                                Logout
+                                            </ModernButton>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Tasks Grid */}
+                    <section className="tasks-grid-container">
+                        {displayTasks.length === 0 ? (
+                            <div className="tasks-empty">
+                                <div className="empty-state">
+                                    <FontAwesomeIcon icon={currentCategory.icon} className="empty-state__icon" />
+                                    <h3 className="empty-state__title">No {currentCategory.label.toLowerCase()}</h3>
+                                    <p className="empty-state__message">
+                                        {activeCategory === 'due' && "You're all caught up! Add a new task to get started."}
+                                        {activeCategory === 'overdue' && "Great! You don't have any overdue tasks."}
+                                        {activeCategory === 'completed' && "Complete some tasks to see them here."}
+                                    </p>
+                                    {activeCategory === 'due' && (
+                                        <ModernButton
+                                            variant="primary"
+                                            onClick={() => setShowModal(true)}
+                                            icon={<FontAwesomeIcon icon={faPlus} />}
+                                        >
+                                            Add Your First Task
+                                        </ModernButton>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="tasks-grid">
+                                {displayTasks.map((task, index) => (
                                     <TaskCard
                                         key={task._id}
                                         task={task}
-                                        variant="overdue"
+                                        variant={currentCategory.variant}
                                         onEdit={handleEditTask}
                                         onDelete={handleDeleteTask}
                                         onComplete={handleCompleteTask}
                                     />
-                                ))
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Due Tasks */}
-                    <div className="tasks-column tasks-column--due">
-                        <div className="tasks-column__header">
-                            <div className="column-header__icon">
-                                <FontAwesomeIcon icon={faTasks} />
+                                ))}
                             </div>
-                            <h3 className="column-header__title">Due Soon</h3>
-                            <div className="column-header__count">{tasks.length}</div>
-                        </div>
-                        
-                        <div className="tasks-column__content">
-                            {filteredTasks(tasks).length === 0 ? (
-                                <div className="tasks-empty">
-                                    <p>No upcoming tasks</p>
-                                </div>
-                            ) : (
-                                filteredTasks(tasks).map((task, index) => (
-                                    <TaskCard
-                                        key={task._id}
-                                        task={task}
-                                        variant="due"
-                                        onEdit={handleEditTask}
-                                        onDelete={handleDeleteTask}
-                                        onComplete={handleCompleteTask}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    </div>
+                        )}
+                    </section>
+                </main>
+            </div>
 
-                    {/* Completed Tasks */}
-                    <div className="tasks-column tasks-column--completed">
-                        <div className="tasks-column__header">
-                            <div className="column-header__icon">
-                                <FontAwesomeIcon icon={faCheckCircle} />
-                            </div>
-                            <h3 className="column-header__title">Completed</h3>
-                            <div className="column-header__count">{completedTasks.length}</div>
-                        </div>
-                        
-                        <div className="tasks-column__content">
-                            {filteredTasks(completedTasks).length === 0 ? (
-                                <div className="tasks-empty">
-                                    <p>No completed tasks</p>
-                                </div>
-                            ) : (
-                                filteredTasks(completedTasks).map((task, index) => (
-                                    <TaskCard
-                                        key={task._id}
-                                        task={task}
-                                        variant="completed"
-                                        onEdit={handleEditTask}
-                                        onDelete={handleDeleteTask}
-                                        onComplete={handleCompleteTask}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </Container>
-
-            {/* Modern Modal */}
+            {/* Modal */}
             <Modal 
                 show={showModal} 
                 onHide={() => { 

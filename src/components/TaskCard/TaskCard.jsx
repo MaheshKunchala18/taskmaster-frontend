@@ -7,7 +7,8 @@ import {
   faClock, 
   faCalendarAlt,
   faGripVertical,
-  faExclamationTriangle
+  faExclamationTriangle,
+  faCheckCircle
 } from '@fortawesome/free-solid-svg-icons';
 import './TaskCard.css';
 
@@ -51,7 +52,7 @@ const TaskCard = ({
       case 'overdue':
         return faExclamationTriangle;
       case 'completed':
-        return faCheck;
+        return faCheckCircle;
       default:
         return faCalendarAlt;
     }
@@ -64,13 +65,15 @@ const TaskCard = ({
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
     
     if (diffDays < 0) {
-      return `${Math.abs(diffDays)} days ago`;
+      const absDays = Math.abs(diffDays);
+      if (absDays === 1) return '1 day ago';
+      return `${absDays} days ago`;
     } else if (diffDays === 0) {
       return 'Today';
     } else if (diffDays === 1) {
       return 'Tomorrow';
     } else {
-      return `In ${diffDays} days`;
+      return `in ${diffDays} days`;
     }
   };
 
@@ -104,17 +107,34 @@ const TaskCard = ({
       <div className="task-card__content">
         <h3 className="task-card__title">{task.task_detail}</h3>
         
-        <div className="task-card__meta">
-          <div className="task-card__date-group">
-            <div className="task-card__date">
-              <FontAwesomeIcon icon={faClock} className="task-card__meta-icon" />
-              <span>{formatDateTime(task.due_time)}</span>
-            </div>
-            <div className="task-card__date task-card__date--created">
-              <FontAwesomeIcon icon={faCalendarAlt} className="task-card__meta-icon" />
-              <span>Created {formatDateTime(task.creation_time)}</span>
-            </div>
+        <div className="task-card__details">
+          <div className="task-detail-row">
+            <FontAwesomeIcon icon={faCalendarAlt} className="detail-icon" />
+            <span className="detail-label">Created at:</span>
+            <span className="detail-value">{formatDateTime(task.creation_time)}</span>
           </div>
+          
+          {task.lastedited_time !== task.creation_time && (
+            <div className="task-detail-row">
+              <FontAwesomeIcon icon={faEdit} className="detail-icon" />
+              <span className="detail-label">Last Edited at:</span>
+              <span className="detail-value">{formatDateTime(task.lastedited_time)}</span>
+            </div>
+          )}
+          
+          <div className="task-detail-row">
+            <FontAwesomeIcon icon={faClock} className="detail-icon" />
+            <span className="detail-label">Due at:</span>
+            <span className="detail-value">{formatDateTime(task.due_time)}</span>
+          </div>
+
+          {variant === 'completed' && task.completion_time && (
+            <div className="task-detail-row">
+              <FontAwesomeIcon icon={faCheck} className="detail-icon" />
+              <span className="detail-label">Completed at:</span>
+              <span className="detail-value">{formatDateTime(task.completion_time)}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -158,17 +178,8 @@ const TaskCard = ({
           <span>Delete</span>
         </button>
       </div>
-
-      {/* Completion Overlay */}
-      {variant === 'completed' && (
-        <div className="task-card__completion-overlay">
-          <div className="task-card__completion-check">
-            <FontAwesomeIcon icon={faCheck} className="task-card__completion-icon" />
-          </div>
-        </div>
-      )}
     </div>
   );
-  };
+};
 
 export default TaskCard; 
