@@ -1,22 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Card, Modal, Form, OverlayTrigger, Popover } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+    faUserCircle,
+    faPlus,
+    faTasks,
+    faExclamationTriangle,
+    faCheckCircle,
+    faSearch,
+    faChevronDown,
+    faClock
+} from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
+import TaskCard from '../../components/TaskCard/TaskCard';
+import ModernButton from '../../components/ModernButton/ModernButton';
+import { NotificationProvider, useNotification } from '../../components/NotificationSystem/NotificationSystem';
+import FloatingLabelInput from '../../components/FloatingLabelInput/FloatingLabelInput';
 import './Tasks.css';
 
-function Tasks() {
+function TasksContent() {
     const navigate = useNavigate();
+    const notification = useNotification();
 
     const [showModal, setShowModal] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [overdueTasks, setOverdueTasks] = useState([]);
+    const [completedTasks, setCompletedTasks] = useState([]);
     const [taskText, setTaskText] = useState('');
     const [dueTime, setDueTime] = useState('');
     const [selectedTask, setSelectedTask] = useState(null);
-    const [completedTasks, setCompletedTasks] = useState([]);
     const [userName, setUserName] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [activeCategory, setActiveCategory] = useState('due');
+    const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     const [userData, setUserData] = useState({
         username: '',
@@ -25,15 +44,25 @@ function Tasks() {
         completed: 0
     });
 
+    const initializeData = useCallback(async (userId) => {
+        setIsLoading(true);
+        try {
+            await Promise.all([fetchUser(userId), fetchTasks(userId)]);
+        } catch (error) {
+            notification.showError('Error Loading Data', 'Failed to load your tasks. Please refresh the page.');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [notification]);
+
     useEffect(() => {
         const userId = localStorage.getItem('userId');
-        fetchUser(userId);
         if (!userId) {
             navigate('/login');
         } else {
-            fetchTasks(userId);
+            initializeData(userId);
         }
-    }, [navigate]);
+    }, [navigate, initializeData]);
 
     const fetchUser = async (userId) => {
         try {
@@ -42,49 +71,40 @@ function Tasks() {
             setUserName(user_name);
         } catch (error) {
             console.error('Error fetching user', error);
+            throw error;
         }
     };
 
     const fetchTasks = async (userId) => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/tasks?userId=${userId}`);
-            setTasks(response.data.dueTasks);
-            setOverdueTasks(response.data.overdueTasks);
-            setCompletedTasks(response.data.completedTasks);
+            setTasks(response.data.dueTasks || []);
+            setOverdueTasks(response.data.overdueTasks || []);
+            setCompletedTasks(response.data.completedTasks || []);
         } catch (error) {
             console.error('Error fetching tasks:', error);
+            throw error;
         }
-    };
-
-    const formatDateTime = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleString("en-GB", {
-            day: '2-digit',
-            month: '2-digit', 
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        }).replace(',', '');
     };
 
     const handleAddTask = async () => {
         if (taskText.trim() !== '') {
             const userId = localStorage.getItem('userId');
-
             const newTask = {
                 user_id: userId,
                 task_detail: taskText,
                 due_time: dueTime
             };
-            
+
             try {
                 await axios.post(`${process.env.REACT_APP_BACKEND_URL}/tasks`, newTask);
-                fetchTasks(userId); // Refresh the task list
+                await fetchTasks(userId);
+                notification.showTaskAdded(taskText);
                 setTaskText('');
                 setDueTime('');
             } catch (error) {
                 console.error('Error adding task:', error);
+                notification.showError('Failed to Add Task', 'There was an error adding your task. Please try again.');
             }
         }
         setShowModal(false);
@@ -93,7 +113,6 @@ function Tasks() {
     const handleEditTask = (task) => {
         setSelectedTask(task);
         setTaskText(task.task_detail);
-        // Convert ISO date to datetime-local format
         if (task.due_time) {
             const date = new Date(task.due_time);
             const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
@@ -110,16 +129,18 @@ function Tasks() {
                 task_detail: taskText,
                 due_time: dueTime
             };
-            
+
             try {
                 await axios.put(`${process.env.REACT_APP_BACKEND_URL}/tasks/${selectedTask._id}`, editedTask);
                 const userId = localStorage.getItem('userId');
-                fetchTasks(userId); // Refresh the task list
+                await fetchTasks(userId);
+                notification.showTaskEdited(taskText);
                 setSelectedTask(null);
                 setTaskText('');
                 setDueTime('');
             } catch (error) {
                 console.error('Error editing task:', error);
+                notification.showError('Failed to Update Task', 'There was an error updating your task. Please try again.');
             }
         }
         setShowModal(false);
@@ -129,9 +150,11 @@ function Tasks() {
         try {
             await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/tasks/${task._id}`);
             const userId = localStorage.getItem('userId');
-            fetchTasks(userId); // Refresh the task list
+            await fetchTasks(userId);
+            notification.showTaskDeleted(task.task_detail);
         } catch (error) {
             console.error('Error deleting task:', error);
+            notification.showError('Failed to Delete Task', 'There was an error deleting your task. Please try again.');
         }
     };
 
@@ -139,181 +162,346 @@ function Tasks() {
         try {
             await axios.put(`${process.env.REACT_APP_BACKEND_URL}/tasks/${task._id}/complete`);
             const userId = localStorage.getItem('userId');
-            fetchTasks(userId); // Refresh the task list
+            await fetchTasks(userId);
+            notification.showTaskCompleted(task.task_detail);
         } catch (error) {
             console.error('Error completing task:', error);
+            notification.showError('Failed to Complete Task', 'There was an error completing your task. Please try again.');
         }
     };
 
     const handleLogOut = () => {
         localStorage.removeItem('userId');
+        notification.showInfo('Logged Out', 'You have been successfully logged out.');
         setTimeout(() => {
             navigate('/');
-        }, 500);
-    }
+        }, 1000);
+    };
 
-    const profilePopover = (
-        <Popover id="popover-basic" className="profile-popover">
-            <Popover.Header as="h3">Profile</Popover.Header>
-            <Popover.Body className='popover-body-text'>
-                <div>Username: {userData.username}</div>
-                <div>Overdue Tasks: {userData.overdue}</div>
-                <div>Due Tasks: {userData.due}</div>
-                <div>Completed Tasks: {userData.completed}</div>
-                <Button className='mt-4' variant="danger" onClick={handleLogOut}>Logout</Button>
-            </Popover.Body>
-        </Popover>
-    );
-
-    const count = () => {
+    const updateUserData = () => {
         setUserData({
             username: userName,
             overdue: overdueTasks.length,
             due: tasks.length,
             completed: completedTasks.length
         });
+    };
+
+    const getActiveTaskList = () => {
+        switch (activeCategory) {
+            case 'overdue':
+                return overdueTasks;
+            case 'completed':
+                return completedTasks;
+            default:
+                return tasks;
+        }
+    };
+
+    const filteredTasks = () => {
+        const taskList = getActiveTaskList();
+        return taskList.filter(task =>
+            task.task_detail.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    };
+
+    const getCategoryInfo = (category) => {
+        switch (category) {
+            case 'overdue':
+                return {
+                    icon: faExclamationTriangle,
+                    label: 'Overdue',
+                    count: overdueTasks.length,
+                    variant: 'overdue'
+                };
+            case 'completed':
+                return {
+                    icon: faCheckCircle,
+                    label: 'Completed',
+                    count: completedTasks.length,
+                    variant: 'completed'
+                };
+            default:
+                return {
+                    icon: faClock,
+                    label: 'Due Soon',
+                    count: tasks.length,
+                    variant: 'due'
+                };
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="tasks-loading">
+                <div className="tasks-loading__spinner"></div>
+                <p>Loading your tasks...</p>
+            </div>
+        );
     }
 
+    const currentCategory = getCategoryInfo(activeCategory);
+    const displayTasks = filteredTasks();
+
     return (
-        <div className="main-todos-page">
-            <Container>
-                <Row>
-                    <Col>
-                        <h1 className="text-white mb-4 d-flex justify-content-between">
-                            Your Todos
-                            <OverlayTrigger onEntering={count} trigger="click" placement="bottom" overlay={profilePopover} rootClose>
-                                <FontAwesomeIcon icon={faUserCircle} size="2x" className="profile-icon" />
-                            </OverlayTrigger>
-                        </h1>
-                    </Col>
-                </Row>
+        <div className="modern-tasks-page">
+            {/* Background Elements */}
+            <div className="tasks-background">
+                <div className="tasks-background__gradient"></div>
+                <div className="tasks-background__particles"></div>
+            </div>
 
-                <Row>
-                    <Col className="text-center mb-4">
-                        <Button variant="primary" onClick={() => setShowModal(true)}>
-                            Add a task
-                        </Button>
-                    </Col>
-                </Row>
+            <div className="tasks-layout">
+                {/* Sidebar Navigation */}
+                <aside className={`tasks-sidebar ${isSidebarCollapsed ? 'tasks-sidebar--collapsed' : ''}`}>
+                    <div className="sidebar-header">
+                        <button
+                            className="sidebar-toggle"
+                            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                        >
+                            <FontAwesomeIcon icon={faTasks} />
+                        </button>
+                        {!isSidebarCollapsed && (
+                            <h3 className="sidebar-title">Categories</h3>
+                        )}
+                    </div>
 
-                <Row>
-                    {/* 1. Overdue Tasks */}
-                    <Col md={4}>
-                        <Card className="mb-4">
-                            <Card.Body>
-                                <Card.Title>Overdue Tasks</Card.Title>
-                                {overdueTasks.length === 0 ? (
-                                    <Card.Text>No overdue tasks.</Card.Text>
-                                ) : (
-                                    overdueTasks.map((task, index) => (
-                                        <Card.Text key={index} className="text-danger">
-                                            Task: {task.task_detail}
-                                            <br />
-                                            Created at: {formatDateTime(task.creation_time)}
-                                            <br />
-                                            Last Edited at: {formatDateTime(task.lastedited_time)}
-                                            <br />
-                                            Due at: {formatDateTime(task.due_time)}
-                                            <br />
-                                            <Button variant="primary" onClick={() => handleEditTask(task)} className="mt-2"> Edit </Button>
-                                            <Button variant="danger" onClick={() => handleDeleteTask(task)} className="mt-2 mx-2"> Delete </Button>
-                                            <Button variant="success" onClick={() => handleCompleteTask(task)} className="mt-2"> Complete </Button>
-                                        </Card.Text>
-                                    ))
-                                )}
-                            </Card.Body>
-                        </Card>
-                    </Col>
+                    <nav className="sidebar-nav">
+                        {['due', 'overdue', 'completed'].map((category) => {
+                            const categoryInfo = getCategoryInfo(category);
+                            return (
+                                <button
+                                    key={category}
+                                    className={`sidebar-nav-item ${activeCategory === category ? 'sidebar-nav-item--active' : ''}`}
+                                    onClick={() => setActiveCategory(category)}
+                                >
+                                    <div className="nav-item-content">
+                                        <div className="nav-item-icon">
+                                            <FontAwesomeIcon icon={categoryInfo.icon} />
+                                        </div>
+                                        {!isSidebarCollapsed && (
+                                            <>
+                                                <span className="nav-item-label">{categoryInfo.label}</span>
+                                                <span className="nav-item-count">{categoryInfo.count}</span>
+                                            </>
+                                        )}
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </nav>
 
-                    {/* 2. Due Tasks */}
-                    <Col md={4}>
-                        <Card className="mb-4">
-                            <Card.Body>
-                                <Card.Title>Due Tasks</Card.Title>
-                                {tasks.length === 0 ? (
-                                    <Card.Text>No due tasks.</Card.Text>
-                                ) : (
-                                    tasks.map((task, index) => (
-                                        <Card.Text key={index}>
-                                            Task: {task.task_detail}
-                                            <br />
-                                            Created at: {formatDateTime(task.creation_time)}
-                                            <br />
-                                            Last Edited at: {formatDateTime(task.lastedited_time)}
-                                            <br />
-                                            Due at: {formatDateTime(task.due_time)}
-                                            <br />
-                                            <Button variant="primary" onClick={() => handleEditTask(task)} className="mt-2"> Edit </Button>
-                                            <Button variant="danger" onClick={() => handleDeleteTask(task)} className="mt-2 mx-2"> Delete </Button>
-                                            <Button variant="success" onClick={() => handleCompleteTask(task)} className="mt-2"> Complete </Button>
-                                        </Card.Text>
-                                    ))
-                                )}
-                            </Card.Body>
-                        </Card>
-                    </Col>
+                    {!isSidebarCollapsed && (
+                        <div className="sidebar-footer">
+                            <div className="sidebar-stats">
+                                <div className="stat-item">
+                                    <span className="stat-label">Total Tasks</span>
+                                    <span className="stat-value">{tasks.length + overdueTasks.length + completedTasks.length}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </aside>
 
-                    {/* 3. Completed Tasks */}
-                    <Col md={4}>
-                        <Card className="mb-4">
-                            <Card.Body>
-                                <Card.Title>Completed Tasks</Card.Title>
-                                {completedTasks.length === 0 ? (
-                                    <Card.Text>No completed tasks.</Card.Text>
-                                ) : (
-                                    completedTasks.map((task, index) => (
-                                        <Card.Text key={index} className="text-success">
-                                            Task: {task.task_detail}
-                                            <br />
-                                            Created at: {formatDateTime(task.creation_time)}
-                                            <br />
-                                            Last Edited at: {formatDateTime(task.lastedited_time)}
-                                            <br />
-                                            Due at: {formatDateTime(task.due_time)}
-                                            <br />
-                                        </Card.Text>
-                                    ))
-                                )}
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            </Container>
+                {/* Main Content */}
+                <main className="tasks-main">
+                    {/* Header */}
+                    <header className="tasks-header">
+                        <div className="tasks-header__content">
+                            <div className="tasks-header__left">
+                                <h1 className="tasks-header__title">
+                                    <FontAwesomeIcon icon={currentCategory.icon} className="tasks-header__icon" />
+                                    {currentCategory.label}
+                                </h1>
+                                <p className="tasks-header__subtitle">
+                                    Welcome back, {userName}! You have {currentCategory.count} {currentCategory.label.toLowerCase()} tasks.
+                                </p>
+                            </div>
 
-            <Modal show={showModal} onHide={() => { setShowModal(false); setSelectedTask(null); }}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{selectedTask ? 'Edit Task' : 'Add Task'}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group controlId="formTaskText">
-                            <Form.Label>Task</Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Enter task"
-                                value={taskText}
-                                onChange={(e) => setTaskText(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="formDueTime">
-                            <Form.Label>Due Time</Form.Label>
-                            <Form.Control
-                                type="datetime-local"
-                                placeholder="Enter due time"
-                                value={dueTime}
-                                onChange={(e) => setDueTime(e.target.value)}
-                            />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => { setShowModal(false); setSelectedTask(null); }}>Close</Button>
-                    <Button variant="primary" onClick={selectedTask ? handleSaveEditTask : handleAddTask}>
-                        {selectedTask ? 'Save Changes' : 'Add Task'}
-                    </Button>
-                </Modal.Footer>
+                            <div className="tasks-header__right">
+                                <div className="tasks-search">
+                                    <FontAwesomeIcon icon={faSearch} className="search-icon" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search tasks..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="search-input"
+                                    />
+                                </div>
+
+                                <ModernButton
+                                    variant="primary"
+                                    size="lg"
+                                    icon={<FontAwesomeIcon icon={faPlus} />}
+                                    onClick={() => setShowModal(true)}
+                                    className="tasks-header__add-btn"
+                                >
+                                    Add Task
+                                </ModernButton>
+
+                                <div className="tasks-header__profile">
+                                    <button
+                                        className="tasks-profile-trigger"
+                                        onClick={() => {
+                                            updateUserData();
+                                            setShowProfileDropdown(!showProfileDropdown);
+                                        }}
+                                    >
+                                        <FontAwesomeIcon icon={faUserCircle} />
+                                        <FontAwesomeIcon icon={faChevronDown} className="profile-chevron" />
+                                    </button>
+
+                                    {showProfileDropdown && (
+                                        <div className="tasks-profile-dropdown">
+                                            <div className="profile-dropdown__header">
+                                                <h4>{userData.username}</h4>
+                                            </div>
+                                            <div className="profile-dropdown__stats">
+                                                <div className="stat-item">
+                                                    <span className="stat-label">Overdue</span>
+                                                    <span className="stat-value stat-value--danger">{userData.overdue}</span>
+                                                </div>
+                                                <div className="stat-item">
+                                                    <span className="stat-label">Due</span>
+                                                    <span className="stat-value stat-value--primary">{userData.due}</span>
+                                                </div>
+                                                <div className="stat-item">
+                                                    <span className="stat-label">Completed</span>
+                                                    <span className="stat-value stat-value--success">{userData.completed}</span>
+                                                </div>
+                                            </div>
+                                            <ModernButton
+                                                variant="error"
+                                                size="sm"
+                                                onClick={handleLogOut}
+                                                className="profile-dropdown__logout"
+                                            >
+                                                Logout
+                                            </ModernButton>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Tasks Grid */}
+                    <section className="tasks-grid-container">
+                        {displayTasks.length === 0 ? (
+                            <div className="tasks-empty">
+                                <div className="empty-state">
+                                    <FontAwesomeIcon icon={currentCategory.icon} className="empty-state__icon" />
+                                    <h3 className="empty-state__title">No {currentCategory.label.toLowerCase()}</h3>
+                                    <p className="empty-state__message">
+                                        {activeCategory === 'due' && "You're all caught up! Add a new task to get started."}
+                                        {activeCategory === 'overdue' && "Great! You don't have any overdue tasks."}
+                                        {activeCategory === 'completed' && "Complete some tasks to see them here."}
+                                    </p>
+                                    {activeCategory === 'due' && (
+                                        <ModernButton
+                                            variant="primary"
+                                            onClick={() => setShowModal(true)}
+                                            icon={<FontAwesomeIcon icon={faPlus} />}
+                                        >
+                                            Add Your First Task
+                                        </ModernButton>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="tasks-grid">
+                                {displayTasks.map((task, index) => (
+                                    <TaskCard
+                                        key={task._id}
+                                        task={task}
+                                        variant={currentCategory.variant}
+                                        onEdit={handleEditTask}
+                                        onDelete={handleDeleteTask}
+                                        onComplete={handleCompleteTask}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </section>
+                </main>
+            </div>
+
+            {/* Modal */}
+            <Modal
+                show={showModal}
+                onHide={() => {
+                    setShowModal(false);
+                    setSelectedTask(null);
+                    setTaskText('');
+                    setDueTime('');
+                }}
+                className="modern-modal"
+                centered
+            >
+                <div className="modal-glass">
+                    <Modal.Header className="modern-modal__header">
+                        <Modal.Title className="modern-modal__title">
+                            {selectedTask ? 'Edit Task' : 'Create New Task'}
+                        </Modal.Title>
+                    </Modal.Header>
+
+                    <Modal.Body className="modern-modal__body">
+                        <Form>
+                            <div className="form-group">
+                                <FloatingLabelInput
+                                    type="text"
+                                    placeholder="Enter task description"
+                                    label="Task Description"
+                                    value={taskText}
+                                    onChange={(e) => setTaskText(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <FloatingLabelInput
+                                    type="datetime-local"
+                                    placeholder="Set due date and time"
+                                    label="Due Date & Time"
+                                    value={dueTime}
+                                    onChange={(e) => setDueTime(e.target.value)}
+                                />
+                            </div>
+                        </Form>
+                    </Modal.Body>
+
+                    <Modal.Footer className="modern-modal__footer">
+                        <ModernButton
+                            variant="secondary"
+                            onClick={() => {
+                                setShowModal(false);
+                                setSelectedTask(null);
+                                setTaskText('');
+                                setDueTime('');
+                            }}
+                        >
+                            Cancel
+                        </ModernButton>
+
+                        <ModernButton
+                            variant="primary"
+                            onClick={selectedTask ? handleSaveEditTask : handleAddTask}
+                            disabled={!taskText.trim()}
+                        >
+                            {selectedTask ? 'Update Task' : 'Create Task'}
+                        </ModernButton>
+                    </Modal.Footer>
+                </div>
             </Modal>
         </div>
+    );
+}
+
+function Tasks() {
+    return (
+        <NotificationProvider>
+            <TasksContent />
+        </NotificationProvider>
     );
 }
 
