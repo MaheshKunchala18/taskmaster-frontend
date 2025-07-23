@@ -1,9 +1,9 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faCheck, 
-  faExclamationTriangle, 
-  faInfoCircle, 
+import {
+  faCheck,
+  faExclamationTriangle,
+  faInfoCircle,
   faTimes,
   faTrash,
   faEdit,
@@ -31,22 +31,22 @@ const NotificationItem = ({ notification, onRemove }) => {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleRemove = useCallback(() => {
+    setIsRemoving(true);
+    setTimeout(() => {
+      onRemove(notification.id);
+    }, 300);
+  }, [onRemove, notification.id]);
+
   useEffect(() => {
     if (notification.duration !== 0) {
       const timer = setTimeout(() => {
         handleRemove();
       }, notification.duration || 4000);
-      
+
       return () => clearTimeout(timer);
     }
-  }, [notification]);
-
-  const handleRemove = () => {
-    setIsRemoving(true);
-    setTimeout(() => {
-      onRemove(notification.id);
-    }, 300);
-  };
+  }, [notification, handleRemove]);
 
   const getIcon = () => {
     switch (notification.type) {
@@ -89,13 +89,13 @@ const NotificationItem = ({ notification, onRemove }) => {
   };
 
   return (
-    <div 
+    <div
       className={`notification ${getTypeClass()} ${isVisible ? 'notification--visible' : ''} ${isRemoving ? 'notification--removing' : ''}`}
     >
       <div className="notification__icon">
         <FontAwesomeIcon icon={getIcon()} />
       </div>
-      
+
       <div className="notification__content">
         <div className="notification__title">{notification.title}</div>
         {notification.message && (
@@ -103,7 +103,7 @@ const NotificationItem = ({ notification, onRemove }) => {
         )}
       </div>
 
-      <button 
+      <button
         className="notification__close"
         onClick={handleRemove}
         aria-label="Close notification"
@@ -143,47 +143,47 @@ export const NotificationProvider = ({ children }) => {
   };
 
   // Convenience methods for different notification types
-  const showSuccess = (title, message, duration) => 
+  const showSuccess = (title, message, duration) =>
     addNotification({ type: 'success', title, message, duration });
 
-  const showError = (title, message, duration) => 
+  const showError = (title, message, duration) =>
     addNotification({ type: 'error', title, message, duration });
 
-  const showWarning = (title, message, duration) => 
+  const showWarning = (title, message, duration) =>
     addNotification({ type: 'warning', title, message, duration });
 
-  const showInfo = (title, message, duration) => 
+  const showInfo = (title, message, duration) =>
     addNotification({ type: 'info', title, message, duration });
 
   // Task-specific notifications
-  const showTaskAdded = (taskName) => 
-    addNotification({ 
-      type: 'taskAdded', 
-      title: 'Task Added', 
+  const showTaskAdded = (taskName) =>
+    addNotification({
+      type: 'taskAdded',
+      title: 'Task Added',
       message: `"${taskName}" has been added to your list`,
       duration: 3000
     });
 
-  const showTaskCompleted = (taskName) => 
-    addNotification({ 
-      type: 'taskCompleted', 
-      title: 'Task Completed', 
+  const showTaskCompleted = (taskName) =>
+    addNotification({
+      type: 'taskCompleted',
+      title: 'Task Completed',
       message: `"${taskName}" marked as completed`,
       duration: 3000
     });
 
-  const showTaskDeleted = (taskName) => 
-    addNotification({ 
-      type: 'taskDeleted', 
-      title: 'Task Deleted', 
+  const showTaskDeleted = (taskName) =>
+    addNotification({
+      type: 'taskDeleted',
+      title: 'Task Deleted',
       message: `"${taskName}" has been removed`,
       duration: 3000
     });
 
-  const showTaskEdited = (taskName) => 
-    addNotification({ 
-      type: 'taskEdited', 
-      title: 'Task Updated', 
+  const showTaskEdited = (taskName) =>
+    addNotification({
+      type: 'taskEdited',
+      title: 'Task Updated',
       message: `"${taskName}" has been modified`,
       duration: 3000
     });

@@ -6,7 +6,6 @@ import {
   faCheck, 
   faClock, 
   faCalendarAlt,
-  faGripVertical,
   faExclamationTriangle,
   faCheckCircle
 } from '@fortawesome/free-solid-svg-icons';
@@ -17,10 +16,7 @@ const TaskCard = ({
   onEdit, 
   onDelete, 
   onComplete, 
-  variant = 'due',
-  isDragging = false,
-  dragHandleProps = {},
-  ...dragProps 
+  variant = 'due'
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -59,6 +55,29 @@ const TaskCard = ({
   };
 
   const formatRelativeTime = (dateString) => {
+    // For completed tasks, show time since completion
+    if (variant === 'completed' && task.completion_time) {
+      const completionDate = new Date(task.completion_time);
+      const now = new Date();
+      const diffMs = now - completionDate;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) {
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        if (diffHours === 0) {
+          const diffMinutes = Math.floor(diffMs / (1000 * 60));
+          if (diffMinutes < 1) return 'just now';
+          return diffMinutes === 1 ? '1 minute ago' : `${diffMinutes} minutes ago`;
+        }
+        return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
+      } else if (diffDays === 1) {
+        return '1 day ago';
+      } else {
+        return `${diffDays} days ago`;
+      }
+    }
+    
+    // For due and overdue tasks, show time relative to due date
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = date - now;
@@ -79,16 +98,10 @@ const TaskCard = ({
 
   return (
     <div 
-      className={`task-card ${getVariantClass()} ${isDragging ? 'task-card--dragging' : ''}`}
+      className={`task-card ${getVariantClass()}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      {...dragProps}
     >
-      {/* Drag Handle */}
-      <div className="task-card__drag-handle" {...dragHandleProps}>
-        <FontAwesomeIcon icon={faGripVertical} />
-      </div>
-
       {/* Background Elements */}
       <div className="task-card__glow"></div>
       <div className="task-card__shimmer"></div>
@@ -114,13 +127,16 @@ const TaskCard = ({
             <span className="detail-value">{formatDateTime(task.creation_time)}</span>
           </div>
           
-          {task.lastedited_time !== task.creation_time && (
-            <div className="task-detail-row">
-              <FontAwesomeIcon icon={faEdit} className="detail-icon" />
-              <span className="detail-label">Last Edited at:</span>
-              <span className="detail-value">{formatDateTime(task.lastedited_time)}</span>
-            </div>
-          )}
+          <div className="task-detail-row">
+            <FontAwesomeIcon icon={faEdit} className="detail-icon" />
+            <span className="detail-label">Last Edited at:</span>
+            <span className="detail-value">
+              {task.lastedited_time !== task.creation_time 
+                ? formatDateTime(task.lastedited_time) 
+                : '-'
+              }
+            </span>
+          </div>
           
           <div className="task-detail-row">
             <FontAwesomeIcon icon={faClock} className="detail-icon" />
@@ -137,13 +153,6 @@ const TaskCard = ({
           )}
         </div>
       </div>
-
-      {/* Progress Bar for Due Tasks */}
-      {variant === 'due' && (
-        <div className="task-card__progress">
-          <div className="task-card__progress-bar"></div>
-        </div>
-      )}
 
       {/* Actions */}
       <div className={`task-card__actions ${isHovered || variant === 'completed' ? 'task-card__actions--visible' : ''}`}>

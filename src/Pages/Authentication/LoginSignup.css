@@ -532,7 +532,7 @@
     padding: 0.75rem;
     margin-bottom: 1rem;
     color: var(--color-error);
-    fontSize: 0.875rem;
+    font-size: 0.875rem;
     text-align: center;
     animation: error-slide-in 0.4s ease-out;
     backdrop-filter: blur(10px);

@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Modal, Form } from 'react-bootstrap';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faUserCircle, 
-  faPlus, 
-  faTasks, 
-  faExclamationTriangle,
-  faCheckCircle,
-  faSearch,
-  faChevronDown,
-  faClock,
-  faCalendarAlt
+import {
+    faUserCircle,
+    faPlus,
+    faTasks,
+    faExclamationTriangle,
+    faCheckCircle,
+    faSearch,
+    faChevronDown,
+    faClock
 } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import TaskCard from '../../components/TaskCard/TaskCard';
@@ -45,16 +44,7 @@ function TasksContent() {
         completed: 0
     });
 
-    useEffect(() => {
-        const userId = localStorage.getItem('userId');
-        if (!userId) {
-            navigate('/login');
-        } else {
-            initializeData(userId);
-        }
-    }, [navigate]);
-
-    const initializeData = async (userId) => {
+    const initializeData = useCallback(async (userId) => {
         setIsLoading(true);
         try {
             await Promise.all([fetchUser(userId), fetchTasks(userId)]);
@@ -63,7 +53,16 @@ function TasksContent() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [notification]);
+
+    useEffect(() => {
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+            navigate('/login');
+        } else {
+            initializeData(userId);
+        }
+    }, [navigate, initializeData]);
 
     const fetchUser = async (userId) => {
         try {
@@ -96,7 +95,7 @@ function TasksContent() {
                 task_detail: taskText,
                 due_time: dueTime
             };
-            
+
             try {
                 await axios.post(`${process.env.REACT_APP_BACKEND_URL}/tasks`, newTask);
                 await fetchTasks(userId);
@@ -130,7 +129,7 @@ function TasksContent() {
                 task_detail: taskText,
                 due_time: dueTime
             };
-            
+
             try {
                 await axios.put(`${process.env.REACT_APP_BACKEND_URL}/tasks/${selectedTask._id}`, editedTask);
                 const userId = localStorage.getItem('userId');
@@ -201,7 +200,7 @@ function TasksContent() {
 
     const filteredTasks = () => {
         const taskList = getActiveTaskList();
-        return taskList.filter(task => 
+        return taskList.filter(task =>
             task.task_detail.toLowerCase().includes(searchTerm.toLowerCase())
         );
     };
@@ -256,7 +255,7 @@ function TasksContent() {
                 {/* Sidebar Navigation */}
                 <aside className={`tasks-sidebar ${isSidebarCollapsed ? 'tasks-sidebar--collapsed' : ''}`}>
                     <div className="sidebar-header">
-                        <button 
+                        <button
                             className="sidebar-toggle"
                             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                         >
@@ -287,9 +286,6 @@ function TasksContent() {
                                             </>
                                         )}
                                     </div>
-                                    {activeCategory === category && (
-                                        <div className="nav-item-indicator"></div>
-                                    )}
                                 </button>
                             );
                         })}
@@ -321,7 +317,7 @@ function TasksContent() {
                                     Welcome back, {userName}! You have {currentCategory.count} {currentCategory.label.toLowerCase()} tasks.
                                 </p>
                             </div>
-                            
+
                             <div className="tasks-header__right">
                                 <div className="tasks-search">
                                     <FontAwesomeIcon icon={faSearch} className="search-icon" />
@@ -345,7 +341,7 @@ function TasksContent() {
                                 </ModernButton>
 
                                 <div className="tasks-header__profile">
-                                    <button 
+                                    <button
                                         className="tasks-profile-trigger"
                                         onClick={() => {
                                             updateUserData();
@@ -432,11 +428,11 @@ function TasksContent() {
             </div>
 
             {/* Modal */}
-            <Modal 
-                show={showModal} 
-                onHide={() => { 
-                    setShowModal(false); 
-                    setSelectedTask(null); 
+            <Modal
+                show={showModal}
+                onHide={() => {
+                    setShowModal(false);
+                    setSelectedTask(null);
                     setTaskText('');
                     setDueTime('');
                 }}
@@ -449,7 +445,7 @@ function TasksContent() {
                             {selectedTask ? 'Edit Task' : 'Create New Task'}
                         </Modal.Title>
                     </Modal.Header>
-                    
+
                     <Modal.Body className="modern-modal__body">
                         <Form>
                             <div className="form-group">
@@ -461,7 +457,7 @@ function TasksContent() {
                                     onChange={(e) => setTaskText(e.target.value)}
                                 />
                             </div>
-                            
+
                             <div className="form-group">
                                 <FloatingLabelInput
                                     type="datetime-local"
@@ -473,20 +469,20 @@ function TasksContent() {
                             </div>
                         </Form>
                     </Modal.Body>
-                    
+
                     <Modal.Footer className="modern-modal__footer">
                         <ModernButton
                             variant="secondary"
-                            onClick={() => { 
-                                setShowModal(false); 
-                                setSelectedTask(null); 
+                            onClick={() => {
+                                setShowModal(false);
+                                setSelectedTask(null);
                                 setTaskText('');
                                 setDueTime('');
                             }}
                         >
                             Cancel
                         </ModernButton>
-                        
+
                         <ModernButton
                             variant="primary"
                             onClick={selectedTask ? handleSaveEditTask : handleAddTask}
