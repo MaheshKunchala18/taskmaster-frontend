@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Modal, Form } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -44,6 +44,29 @@ function TasksContent() {
         completed: 0
     });
 
+    const fetchUser = useCallback(async (userId) => {
+        try {
+            const user = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/user?userId=${userId}`);
+            const user_name = user.data.first_name + ' ' + user.data.last_name;
+            setUserName(user_name);
+        } catch (error) {
+            console.error('Error fetching user', error);
+            throw error;
+        }
+    }, []);
+
+    const fetchTasks = useCallback(async (userId) => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/tasks?userId=${userId}`);
+            setTasks(response.data.dueTasks || []);
+            setOverdueTasks(response.data.overdueTasks || []);
+            setCompletedTasks(response.data.completedTasks || []);
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+            throw error;
+        }
+    }, []);
+
     const initializeData = useCallback(async (userId) => {
         setIsLoading(true);
         try {
@@ -53,7 +76,7 @@ function TasksContent() {
         } finally {
             setIsLoading(false);
         }
-    }, [notification]);
+    }, [notification, fetchUser, fetchTasks]);
 
     useEffect(() => {
         const userId = localStorage.getItem('userId');
@@ -64,30 +87,7 @@ function TasksContent() {
         }
     }, [navigate, initializeData]);
 
-    const fetchUser = async (userId) => {
-        try {
-            const user = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/user?userId=${userId}`);
-            const user_name = user.data.first_name + ' ' + user.data.last_name;
-            setUserName(user_name);
-        } catch (error) {
-            console.error('Error fetching user', error);
-            throw error;
-        }
-    };
-
-    const fetchTasks = async (userId) => {
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/tasks?userId=${userId}`);
-            setTasks(response.data.dueTasks || []);
-            setOverdueTasks(response.data.overdueTasks || []);
-            setCompletedTasks(response.data.completedTasks || []);
-        } catch (error) {
-            console.error('Error fetching tasks:', error);
-            throw error;
-        }
-    };
-
-    const handleAddTask = async () => {
+    const handleAddTask = useCallback(async () => {
         if (taskText.trim() !== '') {
             const userId = localStorage.getItem('userId');
             const newTask = {
@@ -108,9 +108,9 @@ function TasksContent() {
             }
         }
         setShowModal(false);
-    };
+    }, [taskText, dueTime, fetchTasks, notification]);
 
-    const handleEditTask = (task) => {
+    const handleEditTask = useCallback((task) => {
         setSelectedTask(task);
         setTaskText(task.task_detail);
         if (task.due_time) {
@@ -121,9 +121,9 @@ function TasksContent() {
             setDueTime(localDateTime);
         }
         setShowModal(true);
-    };
+    }, []);
 
-    const handleSaveEditTask = async () => {
+    const handleSaveEditTask = useCallback(async () => {
         if (selectedTask && taskText.trim() !== '') {
             const editedTask = {
                 task_detail: taskText,
@@ -144,9 +144,9 @@ function TasksContent() {
             }
         }
         setShowModal(false);
-    };
+    }, [selectedTask, taskText, dueTime, fetchTasks, notification]);
 
-    const handleDeleteTask = async (task) => {
+    const handleDeleteTask = useCallback(async (task) => {
         try {
             await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/tasks/${task._id}`);
             const userId = localStorage.getItem('userId');
@@ -156,9 +156,9 @@ function TasksContent() {
             console.error('Error deleting task:', error);
             notification.showError('Failed to Delete Task', 'There was an error deleting your task. Please try again.');
         }
-    };
+    }, [fetchTasks, notification]);
 
-    const handleCompleteTask = async (task) => {
+    const handleCompleteTask = useCallback(async (task) => {
         try {
             await axios.put(`${process.env.REACT_APP_BACKEND_URL}/tasks/${task._id}/complete`);
             const userId = localStorage.getItem('userId');
@@ -168,26 +168,30 @@ function TasksContent() {
             console.error('Error completing task:', error);
             notification.showError('Failed to Complete Task', 'There was an error completing your task. Please try again.');
         }
-    };
+    }, [fetchTasks, notification]);
 
-    const handleLogOut = () => {
+    const handleLogOut = useCallback(() => {
         localStorage.removeItem('userId');
         notification.showInfo('Logged Out', 'You have been successfully logged out.');
         setTimeout(() => {
             navigate('/');
         }, 1000);
-    };
+    }, [notification, navigate]);
 
-    const updateUserData = () => {
-        setUserData({
-            username: userName,
-            overdue: overdueTasks.length,
-            due: tasks.length,
-            completed: completedTasks.length
-        });
-    };
+    const handleShowModal = useCallback(() => setShowModal(true), []);
+    
+    const handleCloseModal = useCallback(() => {
+        setShowModal(false);
+        setSelectedTask(null);
+        setTaskText('');
+        setDueTime('');
+    }, []);
 
-    const getActiveTaskList = () => {
+    const handleSearchChange = useCallback((e) => setSearchTerm(e.target.value), []);
+    const handleCategoryChange = useCallback((category) => setActiveCategory(category), []);
+    const handleSidebarToggle = useCallback(() => setIsSidebarCollapsed(!isSidebarCollapsed), [isSidebarCollapsed]);
+
+    const getActiveTaskList = useCallback(() => {
         switch (activeCategory) {
             case 'overdue':
                 return overdueTasks;
@@ -196,16 +200,19 @@ function TasksContent() {
             default:
                 return tasks;
         }
-    };
+    }, [activeCategory, tasks, overdueTasks, completedTasks]);
 
-    const filteredTasks = () => {
+    const filteredTasks = useMemo(() => {
         const taskList = getActiveTaskList();
+        if (!searchTerm.trim()) return taskList;
+        
+        const lowerSearchTerm = searchTerm.toLowerCase();
         return taskList.filter(task =>
-            task.task_detail.toLowerCase().includes(searchTerm.toLowerCase())
+            task.task_detail.toLowerCase().includes(lowerSearchTerm)
         );
-    };
+    }, [getActiveTaskList, searchTerm]);
 
-    const getCategoryInfo = (category) => {
+    const getCategoryInfo = useCallback((category) => {
         switch (category) {
             case 'overdue':
                 return {
@@ -229,7 +236,33 @@ function TasksContent() {
                     variant: 'due'
                 };
         }
-    };
+    }, [tasks.length, overdueTasks.length, completedTasks.length]);
+
+    const currentCategory = useMemo(() => 
+        getCategoryInfo(activeCategory), 
+        [getCategoryInfo, activeCategory]
+    );
+
+    const categories = useMemo(() => ['due', 'overdue', 'completed'], []);
+
+    const updateUserData = useCallback(() => {
+        setUserData({
+            username: userName,
+            overdue: overdueTasks.length,
+            due: tasks.length,
+            completed: completedTasks.length
+        });
+    }, [userName, overdueTasks.length, tasks.length, completedTasks.length]);
+
+    const handleProfileToggle = useCallback(() => {
+        updateUserData();
+        setShowProfileDropdown(!showProfileDropdown);
+    }, [updateUserData, showProfileDropdown]);
+
+    const totalTasksCount = useMemo(() => 
+        tasks.length + overdueTasks.length + completedTasks.length,
+        [tasks.length, overdueTasks.length, completedTasks.length]
+    );
 
     if (isLoading) {
         return (
@@ -240,24 +273,19 @@ function TasksContent() {
         );
     }
 
-    const currentCategory = getCategoryInfo(activeCategory);
-    const displayTasks = filteredTasks();
-
     return (
         <div className="modern-tasks-page">
-            {/* Background Elements */}
             <div className="tasks-background">
                 <div className="tasks-background__gradient"></div>
                 <div className="tasks-background__particles"></div>
             </div>
 
             <div className="tasks-layout">
-                {/* Sidebar Navigation */}
                 <aside className={`tasks-sidebar ${isSidebarCollapsed ? 'tasks-sidebar--collapsed' : ''}`}>
                     <div className="sidebar-header">
                         <button
                             className="sidebar-toggle"
-                            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                            onClick={handleSidebarToggle}
                         >
                             <FontAwesomeIcon icon={faTasks} />
                         </button>
@@ -267,13 +295,13 @@ function TasksContent() {
                     </div>
 
                     <nav className="sidebar-nav">
-                        {['due', 'overdue', 'completed'].map((category) => {
+                        {categories.map((category) => {
                             const categoryInfo = getCategoryInfo(category);
                             return (
                                 <button
                                     key={category}
                                     className={`sidebar-nav-item ${activeCategory === category ? 'sidebar-nav-item--active' : ''}`}
-                                    onClick={() => setActiveCategory(category)}
+                                    onClick={() => handleCategoryChange(category)}
                                 >
                                     <div className="nav-item-content">
                                         <div className="nav-item-icon">
@@ -296,16 +324,14 @@ function TasksContent() {
                             <div className="sidebar-stats">
                                 <div className="stat-item">
                                     <span className="stat-label">Total Tasks</span>
-                                    <span className="stat-value">{tasks.length + overdueTasks.length + completedTasks.length}</span>
+                                    <span className="stat-value">{totalTasksCount}</span>
                                 </div>
                             </div>
                         </div>
                     )}
                 </aside>
 
-                {/* Main Content */}
                 <main className="tasks-main">
-                    {/* Header */}
                     <header className="tasks-header">
                         <div className="tasks-header__content">
                             <div className="tasks-header__left">
@@ -325,7 +351,7 @@ function TasksContent() {
                                         type="text"
                                         placeholder="Search tasks..."
                                         value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onChange={handleSearchChange}
                                         className="search-input"
                                     />
                                 </div>
@@ -334,7 +360,7 @@ function TasksContent() {
                                     variant="primary"
                                     size="lg"
                                     icon={<FontAwesomeIcon icon={faPlus} />}
-                                    onClick={() => setShowModal(true)}
+                                    onClick={handleShowModal}
                                     className="tasks-header__add-btn"
                                 >
                                     Add Task
@@ -343,10 +369,7 @@ function TasksContent() {
                                 <div className="tasks-header__profile">
                                     <button
                                         className="tasks-profile-trigger"
-                                        onClick={() => {
-                                            updateUserData();
-                                            setShowProfileDropdown(!showProfileDropdown);
-                                        }}
+                                        onClick={handleProfileToggle}
                                     >
                                         <FontAwesomeIcon icon={faUserCircle} />
                                         <FontAwesomeIcon icon={faChevronDown} className="profile-chevron" />
@@ -386,9 +409,8 @@ function TasksContent() {
                         </div>
                     </header>
 
-                    {/* Tasks Grid */}
                     <section className="tasks-grid-container">
-                        {displayTasks.length === 0 ? (
+                        {filteredTasks.length === 0 ? (
                             <div className="tasks-empty">
                                 <div className="empty-state">
                                     <FontAwesomeIcon icon={currentCategory.icon} className="empty-state__icon" />
@@ -401,7 +423,7 @@ function TasksContent() {
                                     {activeCategory === 'due' && (
                                         <ModernButton
                                             variant="primary"
-                                            onClick={() => setShowModal(true)}
+                                            onClick={handleShowModal}
                                             icon={<FontAwesomeIcon icon={faPlus} />}
                                         >
                                             Add Your First Task
@@ -411,7 +433,7 @@ function TasksContent() {
                             </div>
                         ) : (
                             <div className="tasks-grid">
-                                {displayTasks.map((task, index) => (
+                                {filteredTasks.map((task) => (
                                     <TaskCard
                                         key={task._id}
                                         task={task}
@@ -427,15 +449,9 @@ function TasksContent() {
                 </main>
             </div>
 
-            {/* Modal */}
             <Modal
                 show={showModal}
-                onHide={() => {
-                    setShowModal(false);
-                    setSelectedTask(null);
-                    setTaskText('');
-                    setDueTime('');
-                }}
+                onHide={handleCloseModal}
                 className="modern-modal"
                 centered
             >
@@ -473,12 +489,7 @@ function TasksContent() {
                     <Modal.Footer className="modern-modal__footer">
                         <ModernButton
                             variant="secondary"
-                            onClick={() => {
-                                setShowModal(false);
-                                setSelectedTask(null);
-                                setTaskText('');
-                                setDueTime('');
-                            }}
+                            onClick={handleCloseModal}
                         >
                             Cancel
                         </ModernButton>

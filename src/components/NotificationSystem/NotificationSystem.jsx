@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, createContext, useContext } from 'react';
+import React, { useState, useEffect, useCallback, createContext, useContext, useMemo, memo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faCheck,
@@ -11,22 +11,30 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './NotificationSystem.css';
 
-const NotificationContext = createContext();
+const NotificationMethodsContext = createContext();
+const NotificationListContext = createContext();
 
 export const useNotification = () => {
-  const context = useContext(NotificationContext);
+  const context = useContext(NotificationMethodsContext);
   if (!context) {
     throw new Error('useNotification must be used within a NotificationProvider');
   }
   return context;
 };
 
-const NotificationItem = ({ notification, onRemove }) => {
+const useNotificationList = () => {
+  const context = useContext(NotificationListContext);
+  if (!context) {
+    throw new Error('useNotificationList must be used within a NotificationProvider');
+  }
+  return context;
+};
+
+const NotificationItem = memo(({ notification, onRemove }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
 
   useEffect(() => {
-    // Trigger entrance animation
     const timer = setTimeout(() => setIsVisible(true), 10);
     return () => clearTimeout(timer);
   }, []);
@@ -48,7 +56,7 @@ const NotificationItem = ({ notification, onRemove }) => {
     }
   }, [notification, handleRemove]);
 
-  const getIcon = () => {
+  const icon = useMemo(() => {
     switch (notification.type) {
       case 'success':
         return faCheck;
@@ -67,9 +75,9 @@ const NotificationItem = ({ notification, onRemove }) => {
       default:
         return faInfoCircle;
     }
-  };
+  }, [notification.type]);
 
-  const getTypeClass = () => {
+  const typeClass = useMemo(() => {
     switch (notification.type) {
       case 'success':
       case 'taskAdded':
@@ -86,14 +94,19 @@ const NotificationItem = ({ notification, onRemove }) => {
       default:
         return 'notification--info';
     }
-  };
+  }, [notification.type]);
+
+  const notificationClasses = useMemo(() => [
+    'notification',
+    typeClass,
+    isVisible ? 'notification--visible' : '',
+    isRemoving ? 'notification--removing' : ''
+  ].filter(Boolean).join(' '), [typeClass, isVisible, isRemoving]);
 
   return (
-    <div
-      className={`notification ${getTypeClass()} ${isVisible ? 'notification--visible' : ''} ${isRemoving ? 'notification--removing' : ''}`}
-    >
+    <div className={notificationClasses}>
       <div className="notification__icon">
-        <FontAwesomeIcon icon={getIcon()} />
+        <FontAwesomeIcon icon={icon} />
       </div>
 
       <div className="notification__content">
@@ -116,12 +129,44 @@ const NotificationItem = ({ notification, onRemove }) => {
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.notification.id === nextProps.notification.id &&
+    prevProps.notification.type === nextProps.notification.type &&
+    prevProps.notification.title === nextProps.notification.title &&
+    prevProps.notification.message === nextProps.notification.message &&
+    prevProps.onRemove === nextProps.onRemove
+  );
+});
+
+NotificationItem.displayName = 'NotificationItem';
+
+const NotificationContainer = memo(() => {
+  const { notifications, removeNotification } = useNotificationList();
+
+  const notificationItems = useMemo(() =>
+    notifications.map(notification => (
+      <NotificationItem
+        key={notification.id}
+        notification={notification}
+        onRemove={removeNotification}
+      />
+    )), [notifications, removeNotification]
+  );
+
+  return (
+    <div className="notification-container">
+      {notificationItems}
+    </div>
+  );
+});
+
+NotificationContainer.displayName = 'NotificationContainer';
 
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
 
-  const addNotification = (notification) => {
+  const addNotification = useCallback((notification) => {
     const id = Date.now() + Math.random();
     const newNotification = {
       id,
@@ -132,66 +177,62 @@ export const NotificationProvider = ({ children }) => {
 
     setNotifications(prev => [...prev, newNotification]);
     return id;
-  };
+  }, []);
 
-  const removeNotification = (id) => {
+  const removeNotification = useCallback((id) => {
     setNotifications(prev => prev.filter(notification => notification.id !== id));
-  };
+  }, []);
 
-  const clearAll = () => {
+  const clearAll = useCallback(() => {
     setNotifications([]);
-  };
+  }, []);
 
-  // Convenience methods for different notification types
-  const showSuccess = (title, message, duration) =>
-    addNotification({ type: 'success', title, message, duration });
+  const showSuccess = useCallback((title, message, duration) =>
+    addNotification({ type: 'success', title, message, duration }), [addNotification]);
 
-  const showError = (title, message, duration) =>
-    addNotification({ type: 'error', title, message, duration });
+  const showError = useCallback((title, message, duration) =>
+    addNotification({ type: 'error', title, message, duration }), [addNotification]);
 
-  const showWarning = (title, message, duration) =>
-    addNotification({ type: 'warning', title, message, duration });
+  const showWarning = useCallback((title, message, duration) =>
+    addNotification({ type: 'warning', title, message, duration }), [addNotification]);
 
-  const showInfo = (title, message, duration) =>
-    addNotification({ type: 'info', title, message, duration });
+  const showInfo = useCallback((title, message, duration) =>
+    addNotification({ type: 'info', title, message, duration }), [addNotification]);
 
-  // Task-specific notifications
-  const showTaskAdded = (taskName) =>
+  const showTaskAdded = useCallback((taskName) =>
     addNotification({
       type: 'taskAdded',
       title: 'Task Added',
       message: `"${taskName}" has been added to your list`,
       duration: 3000
-    });
+    }), [addNotification]);
 
-  const showTaskCompleted = (taskName) =>
+  const showTaskCompleted = useCallback((taskName) =>
     addNotification({
       type: 'taskCompleted',
       title: 'Task Completed',
       message: `"${taskName}" marked as completed`,
       duration: 3000
-    });
+    }), [addNotification]);
 
-  const showTaskDeleted = (taskName) =>
+  const showTaskDeleted = useCallback((taskName) =>
     addNotification({
       type: 'taskDeleted',
       title: 'Task Deleted',
       message: `"${taskName}" has been removed`,
       duration: 3000
-    });
+    }), [addNotification]);
 
-  const showTaskEdited = (taskName) =>
+  const showTaskEdited = useCallback((taskName) =>
     addNotification({
       type: 'taskEdited',
       title: 'Task Updated',
       message: `"${taskName}" has been modified`,
       duration: 3000
-    });
+    }), [addNotification]);
 
-  const contextValue = {
-    notifications,
+  const methodsContextValue = useMemo(() => ({
     addNotification,
-    removeNotification,
     clearAll,
     showSuccess,
     showError,
@@ -201,21 +242,31 @@ export const NotificationProvider = ({ children }) => {
     showTaskCompleted,
     showTaskDeleted,
     showTaskEdited,
-  };
+  }), [
+    addNotification,
+    clearAll,
+    showSuccess,
+    showError,
+    showWarning,
+    showInfo,
+    showTaskAdded,
+    showTaskCompleted,
+    showTaskDeleted,
+    showTaskEdited,
+  ]);
+
+  const listContextValue = useMemo(() => ({
+    notifications,
+    removeNotification,
+  }), [notifications, removeNotification]);
 
   return (
-    <NotificationContext.Provider value={contextValue}>
-      {children}
-      <div className="notification-container">
-        {notifications.map(notification => (
-          <NotificationItem
-            key={notification.id}
-            notification={notification}
-            onRemove={removeNotification}
-          />
-        ))}
-      </div>
-    </NotificationContext.Provider>
+    <NotificationMethodsContext.Provider value={methodsContextValue}>
+      <NotificationListContext.Provider value={listContextValue}>
+        {children}
+        <NotificationContainer />
+      </NotificationListContext.Provider>
+    </NotificationMethodsContext.Provider>
   );
 };
 

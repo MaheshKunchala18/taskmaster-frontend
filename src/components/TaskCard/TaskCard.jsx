@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback, memo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faEdit, 
@@ -11,7 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './TaskCard.css';
 
-const TaskCard = ({ 
+const TaskCard = memo(({ 
   task, 
   onEdit, 
   onDelete, 
@@ -20,19 +20,22 @@ const TaskCard = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("en-GB", {
-      day: '2-digit',
-      month: '2-digit', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    }).replace(',', '');
-  };
+  const formatDateTime = useMemo(() => {
+    const memoizedFormatter = (dateString) => {
+      const date = new Date(dateString);
+      return date.toLocaleString("en-GB", {
+        day: '2-digit',
+        month: '2-digit', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      }).replace(',', '');
+    };
+    return memoizedFormatter;
+  }, []);
 
-  const getVariantClass = () => {
+  const variantClass = useMemo(() => {
     switch (variant) {
       case 'overdue':
         return 'task-card--overdue';
@@ -41,9 +44,9 @@ const TaskCard = ({
       default:
         return 'task-card--due';
     }
-  };
+  }, [variant]);
 
-  const getTaskIcon = () => {
+  const taskIcon = useMemo(() => {
     switch (variant) {
       case 'overdue':
         return faExclamationTriangle;
@@ -52,10 +55,9 @@ const TaskCard = ({
       default:
         return faCalendarAlt;
     }
-  };
+  }, [variant]);
 
-  const formatRelativeTime = (dateString) => {
-    // For completed tasks, show time since completion
+  const relativeTime = useMemo(() => {
     if (variant === 'completed' && task.completion_time) {
       const completionDate = new Date(task.completion_time);
       const now = new Date();
@@ -77,8 +79,7 @@ const TaskCard = ({
       }
     }
     
-    // For due and overdue tasks, show time relative to due date
-    const date = new Date(dateString);
+    const date = new Date(task.due_time);
     const now = new Date();
     const diffMs = date - now;
     const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
@@ -94,29 +95,53 @@ const TaskCard = ({
     } else {
       return `in ${diffDays} days`;
     }
-  };
+  }, [task.due_time, task.completion_time, variant]);
+
+  const formattedCreationTime = useMemo(() => 
+    formatDateTime(task.creation_time), [task.creation_time, formatDateTime]
+  );
+
+  const formattedDueTime = useMemo(() => 
+    formatDateTime(task.due_time), [task.due_time, formatDateTime]
+  );
+
+  const formattedEditTime = useMemo(() => 
+    task.lastedited_time !== task.creation_time 
+      ? formatDateTime(task.lastedited_time) 
+      : '-', [task.lastedited_time, task.creation_time, formatDateTime]
+  );
+
+  const formattedCompletionTime = useMemo(() => 
+    variant === 'completed' && task.completion_time 
+      ? formatDateTime(task.completion_time) 
+      : null, [variant, task.completion_time, formatDateTime]
+  );
+
+  const handleMouseEnter = useCallback(() => setIsHovered(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+
+  const handleEditClick = useCallback(() => onEdit(task), [onEdit, task]);
+  const handleDeleteClick = useCallback(() => onDelete(task), [onDelete, task]);
+  const handleCompleteClick = useCallback(() => onComplete(task), [onComplete, task]);
 
   return (
     <div 
-      className={`task-card ${getVariantClass()}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className={`task-card ${variantClass}`}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* Background Elements */}
       <div className="task-card__glow"></div>
       <div className="task-card__shimmer"></div>
 
-      {/* Header */}
       <div className="task-card__header">
         <div className="task-card__icon">
-          <FontAwesomeIcon icon={getTaskIcon()} />
+          <FontAwesomeIcon icon={taskIcon} />
         </div>
         <div className="task-card__relative-time">
-          {formatRelativeTime(task.due_time)}
+          {relativeTime}
         </div>
       </div>
 
-      {/* Content */}
       <div className="task-card__content">
         <h3 className="task-card__title">{task.task_detail}</h3>
         
@@ -124,43 +149,37 @@ const TaskCard = ({
           <div className="task-detail-row">
             <FontAwesomeIcon icon={faCalendarAlt} className="detail-icon" />
             <span className="detail-label">Created at:</span>
-            <span className="detail-value">{formatDateTime(task.creation_time)}</span>
+            <span className="detail-value">{formattedCreationTime}</span>
           </div>
           
           <div className="task-detail-row">
             <FontAwesomeIcon icon={faEdit} className="detail-icon" />
             <span className="detail-label">Last Edited at:</span>
-            <span className="detail-value">
-              {task.lastedited_time !== task.creation_time 
-                ? formatDateTime(task.lastedited_time) 
-                : '-'
-              }
-            </span>
+            <span className="detail-value">{formattedEditTime}</span>
           </div>
           
           <div className="task-detail-row">
             <FontAwesomeIcon icon={faClock} className="detail-icon" />
             <span className="detail-label">Due at:</span>
-            <span className="detail-value">{formatDateTime(task.due_time)}</span>
+            <span className="detail-value">{formattedDueTime}</span>
           </div>
 
-          {variant === 'completed' && task.completion_time && (
+          {formattedCompletionTime && (
             <div className="task-detail-row">
               <FontAwesomeIcon icon={faCheck} className="detail-icon" />
               <span className="detail-label">Completed at:</span>
-              <span className="detail-value">{formatDateTime(task.completion_time)}</span>
+              <span className="detail-value">{formattedCompletionTime}</span>
             </div>
           )}
         </div>
       </div>
 
-      {/* Actions */}
       <div className={`task-card__actions ${isHovered || variant === 'completed' ? 'task-card__actions--visible' : ''}`}>
         {variant !== 'completed' && (
           <>
             <button 
               className="task-card__action task-card__action--edit"
-              onClick={() => onEdit(task)}
+              onClick={handleEditClick}
               title="Edit Task"
             >
               <FontAwesomeIcon icon={faEdit} />
@@ -169,7 +188,7 @@ const TaskCard = ({
             
             <button 
               className="task-card__action task-card__action--complete"
-              onClick={() => onComplete(task)}
+              onClick={handleCompleteClick}
               title="Complete Task"
             >
               <FontAwesomeIcon icon={faCheck} />
@@ -180,7 +199,7 @@ const TaskCard = ({
         
         <button 
           className="task-card__action task-card__action--delete"
-          onClick={() => onDelete(task)}
+          onClick={handleDeleteClick}
           title="Delete Task"
         >
           <FontAwesomeIcon icon={faTrash} />
@@ -189,6 +208,21 @@ const TaskCard = ({
       </div>
     </div>
   );
-};
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.task._id === nextProps.task._id &&
+    prevProps.task.task_detail === nextProps.task.task_detail &&
+    prevProps.task.due_time === nextProps.task.due_time &&
+    prevProps.task.creation_time === nextProps.task.creation_time &&
+    prevProps.task.lastedited_time === nextProps.task.lastedited_time &&
+    prevProps.task.completion_time === nextProps.task.completion_time &&
+    prevProps.variant === nextProps.variant &&
+    prevProps.onEdit === nextProps.onEdit &&
+    prevProps.onDelete === nextProps.onDelete &&
+    prevProps.onComplete === nextProps.onComplete
+  );
+});
+
+TaskCard.displayName = 'TaskCard';
 
 export default TaskCard; 

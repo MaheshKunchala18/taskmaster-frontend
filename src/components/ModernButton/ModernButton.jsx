@@ -1,7 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useMemo, memo } from 'react';
 import './ModernButton.css';
 
-const ModernButton = ({ 
+const ModernButton = memo(({ 
   children, 
   onClick, 
   type = 'button', 
@@ -17,10 +17,23 @@ const ModernButton = ({
   const [ripples, setRipples] = useState([]);
   const buttonRef = useRef(null);
 
-  const handleClick = (e) => {
+  const buttonClasses = useMemo(() => [
+    'modern-button',
+    `modern-button--${variant}`,
+    `modern-button--${size}`,
+    loading ? 'modern-button--loading' : '',
+    disabled ? 'modern-button--disabled' : '',
+    className
+  ].filter(Boolean).join(' '), [variant, size, loading, disabled, className]);
+
+  const removeRipple = useCallback((rippleKey) => {
+    setRipples(prev => prev.filter(ripple => ripple.key !== rippleKey));
+  }, []);
+
+  const handleClick = useCallback((e) => {
     if (disabled || loading) return;
 
-    if (ripple) {
+    if (ripple && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       const size = Math.max(rect.width, rect.height);
       const x = e.clientX - rect.left - size / 2;
@@ -35,25 +48,38 @@ const ModernButton = ({
 
       setRipples(prev => [...prev, newRipple]);
 
-
       setTimeout(() => {
-        setRipples(prev => prev.filter(ripple => ripple.key !== newRipple.key));
+        removeRipple(newRipple.key);
       }, 600);
     }
 
     if (onClick) {
       onClick(e);
     }
-  };
+  }, [disabled, loading, ripple, onClick, removeRipple]);
 
-  const buttonClasses = [
-    'modern-button',
-    `modern-button--${variant}`,
-    `modern-button--${size}`,
-    loading ? 'modern-button--loading' : '',
-    disabled ? 'modern-button--disabled' : '',
-    className
-  ].filter(Boolean).join(' ');
+  const rippleElements = useMemo(() => 
+    ripples.map(ripple => (
+      <span
+        key={ripple.key}
+        className="modern-button__ripple"
+        style={{
+          left: ripple.x,
+          top: ripple.y,
+          width: ripple.size,
+          height: ripple.size,
+        }}
+      />
+    )), [ripples]
+  );
+
+  const loaderElements = useMemo(() => (
+    <>
+      <div className="loader-ring"></div>
+      <div className="loader-ring"></div>
+      <div className="loader-ring"></div>
+    </>
+  ), []);
 
   return (
     <button
@@ -67,9 +93,7 @@ const ModernButton = ({
       <div className="modern-button__content">
         {loading && (
           <div className="modern-button__loader">
-            <div className="loader-ring"></div>
-            <div className="loader-ring"></div>
-            <div className="loader-ring"></div>
+            {loaderElements}
           </div>
         )}
         
@@ -86,24 +110,27 @@ const ModernButton = ({
 
       {ripple && (
         <div className="modern-button__ripples">
-          {ripples.map(ripple => (
-            <span
-              key={ripple.key}
-              className="modern-button__ripple"
-              style={{
-                left: ripple.x,
-                top: ripple.y,
-                width: ripple.size,
-                height: ripple.size,
-              }}
-            />
-          ))}
+          {rippleElements}
         </div>
       )}
 
       <div className="modern-button__glow"></div>
     </button>
   );
-};
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.children === nextProps.children &&
+    prevProps.variant === nextProps.variant &&
+    prevProps.size === nextProps.size &&
+    prevProps.loading === nextProps.loading &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.ripple === nextProps.ripple &&
+    prevProps.className === nextProps.className &&
+    prevProps.onClick === nextProps.onClick &&
+    prevProps.type === nextProps.type
+  );
+});
+
+ModernButton.displayName = 'ModernButton';
 
 export default ModernButton; 
