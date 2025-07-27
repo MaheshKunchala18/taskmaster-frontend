@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback, useMemo, memo } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import './FloatingLabelInput.css';
 
-const FloatingLabelInput = ({
+const FloatingLabelInput = memo(({
     label,
     type = 'text',
     value,
@@ -17,29 +17,53 @@ const FloatingLabelInput = ({
     const [showPassword, setShowPassword] = useState(false);
     const inputRef = useRef(null);
 
-    const isActive = isFocused || value;
-    const inputType = type === 'password' && showPassword ? 'text' : type;
+    const isActive = useMemo(() => isFocused || value, [isFocused, value]);
+    const inputType = useMemo(() => 
+        type === 'password' && showPassword ? 'text' : type, 
+        [type, showPassword]
+    );
 
-    const handleFocus = () => {
+    const containerClasses = useMemo(() => [
+        'floating-input-container',
+        error ? 'error' : '',
+        isActive ? 'active' : ''
+    ].filter(Boolean).join(' '), [error, isActive]);
+
+    const labelClasses = useMemo(() => [
+        'floating-label',
+        isActive ? 'float' : ''
+    ].filter(Boolean).join(' '), [isActive]);
+
+    const handleFocus = useCallback(() => {
         setIsFocused(true);
-    };
+    }, []);
 
-    const handleBlur = () => {
+    const handleBlur = useCallback(() => {
         setIsFocused(false);
-    };
+    }, []);
 
-    const handleLabelClick = () => {
+    const handleLabelClick = useCallback(() => {
         if (inputRef.current) {
             inputRef.current.focus();
         }
-    };
+    }, []);
 
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
+    const togglePasswordVisibility = useCallback(() => {
+        setShowPassword(prev => !prev);
+    }, []);
+
+    const passwordToggleIcon = useMemo(() => 
+        showPassword ? <FaEye /> : <FaEyeSlash />, 
+        [showPassword]
+    );
+
+    const passwordToggleAriaLabel = useMemo(() => 
+        showPassword ? 'Hide password' : 'Show password', 
+        [showPassword]
+    );
 
     return (
-        <div className={`floating-input-container ${error ? 'error' : ''} ${isActive ? 'active' : ''}`}>
+        <div className={containerClasses}>
             {icon && (
                 <div className="floating-input-icon">
                     {icon}
@@ -59,7 +83,7 @@ const FloatingLabelInput = ({
             />
 
             <label
-                className={`floating-label ${isActive ? 'float' : ''}`}
+                className={labelClasses}
                 onClick={handleLabelClick}
             >
                 {label}
@@ -71,9 +95,9 @@ const FloatingLabelInput = ({
                     type="button"
                     className="password-toggle-btn"
                     onClick={togglePasswordVisibility}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={passwordToggleAriaLabel}
                 >
-                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                    {passwordToggleIcon}
                 </button>
             )}
 
@@ -81,6 +105,19 @@ const FloatingLabelInput = ({
             <div className="floating-input-focus-border"></div>
         </div>
     );
-};
+}, (prevProps, nextProps) => {
+    return (
+        prevProps.label === nextProps.label &&
+        prevProps.type === nextProps.type &&
+        prevProps.value === nextProps.value &&
+        prevProps.required === nextProps.required &&
+        prevProps.error === nextProps.error &&
+        prevProps.showPasswordToggle === nextProps.showPasswordToggle &&
+        prevProps.icon === nextProps.icon &&
+        prevProps.onChange === nextProps.onChange
+    );
+});
+
+FloatingLabelInput.displayName = 'FloatingLabelInput';
 
 export default FloatingLabelInput; 
