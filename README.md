@@ -1,5 +1,4 @@
 # 📝 **Task Master**
-
 A comprehensive task management system that helps users manage their tasks effectively with features like categorization, secure authentication, and responsive design.
 
 ## Links
